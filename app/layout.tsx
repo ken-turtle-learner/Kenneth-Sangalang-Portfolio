@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, IBM_Plex_Mono, Newsreader } from "next/font/google";
+import { IBM_Plex_Mono, Montserrat, Newsreader } from "next/font/google";
 import { NO_FLASH_THEME_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+// All three fonts are declared here at module scope (not inside a
+// component) per the project's server-hoist-static-io performance rule —
+// this ensures next/font only ever initializes them once, at build/module
+// load time, rather than re-running on every render.
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
   display: "swap",
-  axes: ["opsz", "wdth"],
+  // Montserrat is a variable font with only a weight axis (no opsz/wdth),
+  // so "variable" gives the full weight range without an `axes` option.
+  weight: "variable",
 });
 
 const newsreader = Newsreader({
@@ -20,13 +27,38 @@ const plexMono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
   subsets: ["latin"],
   display: "swap",
+  // IBM Plex Mono isn't a variable font, so weights must be listed explicitly.
   weight: ["400", "500"],
 });
 
+const TITLE = "Kenneth Sangalang — Digital Marketing & Marketing Automation Specialist";
+const DESCRIPTION =
+  "Marketing automation and lifecycle campaigns that convert, built by someone who also ships the code underneath them.";
+
 export const metadata: Metadata = {
-  title: "Kenneth Sangalang — Digital Marketing & Marketing Automation Specialist",
-  description:
-    "Marketing automation and lifecycle campaigns that convert, built by someone who also ships the code underneath them.",
+  // `template` lets child routes (e.g. /work/[slug]) set just their own
+  // title via generateMetadata and get " — Kenneth Sangalang" appended
+  // automatically, instead of every route re-typing the suffix by hand.
+  title: {
+    default: TITLE,
+    template: "%s — Kenneth Sangalang",
+  },
+  description: DESCRIPTION,
+  // No metadataBase set yet — the site has no confirmed deployment domain.
+  // Next falls back to resolving OG/Twitter image URLs relative to each
+  // request, which works but logs a build warning; set metadataBase to the
+  // real domain once one exists.
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    type: "website",
+    siteName: "Kenneth Sangalang",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
@@ -37,16 +69,38 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      // Dark is the default theme — server-rendered as "dark" so there's
+      // nothing to flash on first paint. If the visitor previously chose
+      // light, NO_FLASH_THEME_SCRIPT below flips this attribute to "light"
+      // synchronously before paint. app/globals.css keys its color tokens
+      // off this attribute (see :root[data-theme="light"]).
       data-theme="dark"
+      // Tells Next.js's router that scroll-behavior: smooth (set in
+      // globals.css) is intentional, so it exempts its own route-change
+      // scroll handling from it — see the comment on `html` in globals.css
+      // for the full story.
       data-scroll-behavior="smooth"
+      // We intentionally mutate data-theme via a plain <script> outside
+      // React's render (see below), so React's hydration check would
+      // otherwise warn about a mismatch here — this silences that expected,
+      // harmless case.
       suppressHydrationWarning
-      className={`${bricolage.variable} ${newsreader.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${montserrat.variable} ${newsreader.variable} ${plexMono.variable} h-full antialiased`}
     >
       <head>
+        {/* Blocking script, runs before first paint: flips data-theme to
+            "light" if that's what's stored, so a returning visitor with a
+            light preference never sees a flash of the dark default. */}
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH_THEME_SCRIPT }} />
       </head>
       <body className="theme-transition min-h-full flex flex-col">
+        {/* Fixed full-viewport gradient layer, behind all content (z-index:
+            -1). Lives outside <main> since it never scrolls with the page —
+            see .bg-gradient-layer in globals.css for the actual gradients. */}
         <div className="bg-gradient-layer" aria-hidden="true" />
+        {/* Accessibility floor requirement: first focusable element on the
+            page, visually hidden until focused, lets keyboard/screen-reader
+            users skip the (future) nav straight to page content. */}
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>

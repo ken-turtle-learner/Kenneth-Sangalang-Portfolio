@@ -1,3 +1,14 @@
+// All four case studies below are transcribed from
+// content-source/Kenneth_Sangalang_Career_Profile.md (the "Case Study
+// Source Notes" sections) and Kenneth_Sangalang_Master_Resume.md, plus a
+// few facts Kenneth confirmed directly in conversation (the 48% pre-launch
+// baseline for CS1, and the coaching-portal scope for CS4 — see the build
+// plan's "Resolved flags" section for the full paper trail). Nothing here
+// should be invented: `process`/`learnings` are left undefined wherever the
+// source material didn't actually say anything, rather than padded out.
+
+// A single automation-canvas node: one box in the ActiveCampaign/Zapier-
+// style diagram (see components/AutomationCanvas, built in Phase 4).
 export type AutomationNode = {
   id: string;
   kind: "trigger" | "email" | "wait" | "goal";
@@ -6,6 +17,8 @@ export type AutomationNode = {
   metric?: string;
 };
 
+// A branching point in the canvas (CS1's "did they finish?" split) — models
+// two labeled outcomes, each continuing into its own list of nodes.
 export type AutomationBranch = {
   id: string;
   kind: "branch";
@@ -14,9 +27,15 @@ export type AutomationBranch = {
   outcomes: { label: string; nodes: AutomationNode[] }[];
 };
 
+// A canvas is just an ordered list of these two step shapes.
 export type CanvasStep = AutomationNode | AutomationBranch;
 
+// "Result vs. industry median" row (used where there's no real before-state
+// to compare against, e.g. CS2/CS4 — comparing against a benchmark is the
+// honest framing there instead of a fabricated Before column).
 export type BenchmarkRow = { label: string; result: string; comparison: string };
+// "Before -> After" row (used only for CS1, which is the one case study
+// with a genuine pre-launch baseline — see the 48% note above).
 export type BeforeAfterRow = { label: string; before: string; after: string; delta: string };
 
 export type Figure = { src: string; alt: string; caption: string };
@@ -29,11 +48,18 @@ export type QuickFacts = {
   impact: string;
 };
 
+// One case study, driving both its home-page card and its /work/[slug]
+// page. `process` and `learnings` are optional and intentionally omitted
+// on studies where the source docs didn't give real material — the
+// /work/[slug] page (Phase 5) should skip rendering those sections rather
+// than show empty headings.
 export type CaseStudy = {
   slug: string;
   discipline: string;
   title: string;
+  // One-liner for the home page card.
   cardOutcome: string;
+  // Fuller framing sentence for the case study page's lead paragraph.
   leadOutcome: string;
   headlineMetric?: string;
   tags: string[];
@@ -42,18 +68,32 @@ export type CaseStudy = {
   problem: string;
   process?: string[];
   solution: string;
+  // Which results table shape to render — see BenchmarkRow/BeforeAfterRow
+  // above for why this varies per case study instead of being uniform.
   resultsType: "benchmark" | "before-after" | "operational";
   benchmarkResults?: BenchmarkRow[];
   beforeAfterResults?: BeforeAfterRow[];
+  // Honesty line for "operational" case studies with no real metric to show
+  // (CS3, CS4) — states plainly that no number exists, instead of omitting
+  // the topic and letting its absence look like an oversight.
   metricsNote?: string;
   learnings?: string[];
+  // Plain statement of what Kenneth did/didn't do on this project — every
+  // case study renders one, per the plan's non-negotiable on not overclaiming.
   roleAttribution: string;
   canvas?: CanvasStep[];
   figures?: Figure[];
   creditLine?: string;
 };
 
+// Ordered to match the plan's featured-work order: CS1 leads because it's
+// the one fully attributable to Kenneth end-to-end (strategy, copy, build,
+// and a real measured result), per his own career profile notes.
 export const caseStudies: CaseStudy[] = [
+  // CS1 — the only case study with a genuine pre-launch baseline (48%,
+  // confirmed by Kenneth directly rather than sourced from the docs), so
+  // it's the one that gets a real before/after table instead of a
+  // benchmark comparison.
   {
     slug: "so-tool-reengagement",
     discipline: "Email Marketing · Lifecycle Automation",

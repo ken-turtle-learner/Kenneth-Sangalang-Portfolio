@@ -5,6 +5,10 @@ export type ExperienceEntry = {
   bullets: string[];
 };
 
+// Brave Leadership's 8 bullets, transcribed from the resume — one edit vs.
+// the source text: the re-engagement bullet now states the real 48% -> 63%
+// lift (confirmed by Kenneth in conversation) instead of the resume's
+// original unanchored "contributing to a 63% completion rate."
 export const braveLeadership: ExperienceEntry = {
   company: "Digital Marketing Specialist — Brave Leadership",
   dates: "11/2020 – 06/2026",

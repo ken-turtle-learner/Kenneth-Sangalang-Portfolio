@@ -1,3 +1,7 @@
+// Transcribed from content-source/Kenneth_Sangalang_Master_Resume.md and
+// Kenneth_Sangalang_Career_Profile.md. Drives the hero, about, and contact
+// sections — kept as a single object (rather than split further) since
+// every field here is a one-off, not a repeated/listy structure.
 export const profile = {
   name: "Kenneth Sangalang",
   titles: ["Digital Marketing Specialist", "Marketing Automation Specialist", "MarTech Specialist"],
