@@ -16,7 +16,11 @@ export type Theme = "dark" | "light";
 // Versioned so a future breaking change to how theme is stored (e.g. adding
 // a "system" option) can invalidate old values instead of misreading them.
 const STORAGE_KEY = "ks-theme-v1";
-const DEFAULT_THEME: Theme = "dark";
+// Light is the default. This must stay in sync with three other places or a
+// returning visitor sees a flash of the wrong theme: the bare :root token
+// block in app/globals.css, <html data-theme> in app/layout.tsx, and the
+// theme NO_FLASH_THEME_SCRIPT checks for at the bottom of this file.
+const DEFAULT_THEME: Theme = "light";
 // Custom event used to notify same-tab subscribers (e.g. ThemeToggle) that
 // the theme changed. localStorage's own "storage" event only fires in
 // *other* tabs, never the tab that made the write, so we need this to make
@@ -42,7 +46,7 @@ export function getStoredTheme(): Theme {
 
 // Server-side snapshot for useSyncExternalStore. The server can't read
 // localStorage, so it must return the same default the server-rendered HTML
-// already assumes (see <html data-theme="dark"> in app/layout.tsx) — this is
+// already assumes (see <html data-theme="light"> in app/layout.tsx) — this is
 // what keeps hydration from mismatching.
 export function getServerTheme(): Theme {
   return DEFAULT_THEME;
@@ -68,4 +72,9 @@ export function subscribeToTheme(callback: () => void): () => void {
 // before first paint. Must stay a plain string (no imports, no template
 // helpers) since it runs outside the React/module graph, directly in the
 // browser, before any JS bundle has loaded.
-export const NO_FLASH_THEME_SCRIPT = `(function(){try{var t=window.localStorage.getItem("${STORAGE_KEY}");if(t==="light"){document.documentElement.dataset.theme="light"}}catch(e){}})();`;
+//
+// Only the non-default theme needs handling here: the server already renders
+// data-theme="light", so a visitor with no stored preference (or a stored
+// "light") needs no flip at all. Checking for "dark" is what makes this the
+// mirror of DEFAULT_THEME above — flip both together or neither.
+export const NO_FLASH_THEME_SCRIPT = `(function(){try{var t=window.localStorage.getItem("${STORAGE_KEY}");if(t==="dark"){document.documentElement.dataset.theme="dark"}}catch(e){}})();`;

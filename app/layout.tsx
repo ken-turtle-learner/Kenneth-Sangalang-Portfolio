@@ -31,9 +31,12 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
-const TITLE = "Kenneth Sangalang — Digital Marketing & Marketing Automation Specialist";
+// Names all three targeted roles rather than leading on email/lifecycle work,
+// which the site had previously over-indexed on relative to the WordPress and
+// integration work that makes up just as much of the portfolio.
+const TITLE = "Kenneth Sangalang — Digital Marketing, Marketing Automation & WordPress Specialist";
 const DESCRIPTION =
-  "Marketing automation and lifecycle campaigns that convert, built by someone who also ships the code underneath them.";
+  "WordPress sites, marketing automation, and the custom REST integrations that connect them — built by someone who also ships the code underneath.";
 
 export const metadata: Metadata = {
   // `template` lets child routes (e.g. /work/[slug]) set just their own
@@ -69,12 +72,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      // Dark is the default theme — server-rendered as "dark" so there's
+      // Light is the default theme — server-rendered as "light" so there's
       // nothing to flash on first paint. If the visitor previously chose
-      // light, NO_FLASH_THEME_SCRIPT below flips this attribute to "light"
+      // dark, NO_FLASH_THEME_SCRIPT below flips this attribute to "dark"
       // synchronously before paint. app/globals.css keys its color tokens
-      // off this attribute (see :root[data-theme="light"]).
-      data-theme="dark"
+      // off this attribute (see :root[data-theme="dark"]).
+      data-theme="light"
       // Tells Next.js's router that scroll-behavior: smooth (set in
       // globals.css) is intentional, so it exempts its own route-change
       // scroll handling from it — see the comment on `html` in globals.css
@@ -89,8 +92,8 @@ export default function RootLayout({
     >
       <head>
         {/* Blocking script, runs before first paint: flips data-theme to
-            "light" if that's what's stored, so a returning visitor with a
-            light preference never sees a flash of the dark default. */}
+            "dark" if that's what's stored, so a returning visitor with a
+            dark preference never sees a flash of the light default. */}
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH_THEME_SCRIPT }} />
       </head>
       <body className="theme-transition min-h-full flex flex-col">

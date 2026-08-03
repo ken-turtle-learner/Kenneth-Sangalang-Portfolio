@@ -3,10 +3,53 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ---- Color tokens ---- */
-/* Dark navy at dusk is the default palette; light overrides live under
-   [data-theme="light"] so the server-rendered default (no attribute flip
-   needed) is already correct and there is nothing to flash. */
+/* Light is the default palette: a warm near-white "sunset sky" (cream ->
+   peach -> pink -> rose) pushed close to white, so it reads as a whisper of
+   color rather than a visible gradient. It lives in bare :root — not behind
+   a data-theme attribute — so the server-rendered HTML is already correct
+   and there is nothing to flash on first paint. Dark overrides live under
+   [data-theme="dark"] and are flipped in before paint by
+   NO_FLASH_THEME_SCRIPT for visitors who previously chose dark. */
 :root {
+  /* body's own background, sitting below the fixed .bg-gradient-layer —
+     matches the gradient's bottom stop as a defensive fallback for anywhere
+     the fixed layer doesn't reach (content taller than one viewport captured
+     in a single non-scrolling render, print). */
+  --bg: #fdf6f8;
+  --bg-grad-top: #fffdfb;
+  --bg-grad-upper: #fff6ef;
+  --bg-grad-lower: #fff2f3;
+  --bg-grad-bottom: #fdf6f8;
+  /* Slightly more opaque than a plain white wash so cards still read as
+     distinct objects against this very pale backdrop. */
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface-raised: rgba(255, 255, 255, 0.95);
+  --border: rgba(15, 38, 71, 0.12);
+  --border-strong: rgba(15, 38, 71, 0.2);
+  --text: #0f2647;
+  --text-secondary: #3d5878;
+  /* #527093 clears 4.5:1 with margin (~5:1) against every surface in this
+     theme while staying in the same muted blue-gray family, visibly lighter
+     than --text-secondary. Do not lighten it further: .type-small is 15px,
+     below the WCAG large-text threshold, so it needs the full 4.5:1. An
+     earlier #6B819E measured only ~3.3-3.9:1 and was a real AA failure. */
+  --text-muted: #527093;
+  --accent: #0d9488;
+  --accent-text: #115e59;
+  --accent-strong: #0d9488;
+  --accent-soft: rgba(13, 148, 136, 0.1);
+  --shadow-card: 0 1px 2px rgba(15, 38, 71, 0.05), 0 8px 24px rgba(15, 38, 71, 0.06);
+
+  --container-page: 71.25rem;
+  --font-newsreader-weight-body: 400;
+}
+
+/* Dark navy at dusk. The gradient tokens are deliberately asymmetric between
+   the two themes — light blends four stops (top/upper/lower/bottom), dark
+   blends three (bg/mid/bottom) — which is why each theme also carries its own
+   .bg-gradient-layer rule further down. --bg-grad-upper/--bg-grad-lower are
+   simply left unused here rather than redefined. */
+:root[data-theme="dark"] {
   --bg: #0a1628;
   --bg-grad-top: #12203a;
   --bg-grad-mid: #0b172b;
@@ -23,51 +66,6 @@
   --accent-strong: #22c3c7;
   --accent-soft: rgba(12, 147, 151, 0.12);
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.25);
-  --card-surface: rgba(16, 28, 48, 1);
-  --card-blur: none;
-
-  --container-page: 71.25rem;
-  --font-newsreader-weight-body: 400;
-}
-
-/* Lighter pass on the original "sunset sky" concept: same warm hues (cream
-   -> peach -> pink -> rose), but pushed much closer to white — a whisper of
-   color rather than a visible gradient, for a cleaner, whiter feel. Text/
-   accent colors are unchanged; against a lighter background their contrast
-   only improves. --surface/--border are bumped slightly more opaque than
-   the original so cards still read as distinct objects now that they're
-   sitting on a much paler backdrop. */
-:root[data-theme="light"] {
-  /* body's own background (below the fixed .bg-gradient-layer) — matches
-     the gradient's bottom stop as a defensive fallback for anywhere the
-     fixed layer doesn't reach (e.g. content taller than one viewport
-     captured in a single non-scrolling render, print). --bg has no such
-     gap in dark mode since it's already the darkest stop in that gradient. */
-  --bg: #fdf6f8;
-  --bg-grad-top: #fffdfb;
-  --bg-grad-upper: #fff6ef;
-  --bg-grad-lower: #fff2f3;
-  --bg-grad-bottom: #fdf6f8;
-  --surface: rgba(255, 255, 255, 0.85);
-  --surface-raised: rgba(255, 255, 255, 0.95);
-  --border: rgba(15, 38, 71, 0.12);
-  --border-strong: rgba(15, 38, 71, 0.2);
-  --text: #0f2647;
-  --text-secondary: #3d5878;
-  /* Darkened from the original #6B819E, which measured only ~3.3-3.9:1
-     against the light backgrounds (old and new) — a real WCAG AA failure
-     for normal-size text (.type-small is 15px, below the large-text
-     threshold) that the accessibility floor's "no text below 4.5:1" rule
-     was supposed to catch. #527093 clears 4.5:1 with margin (~5:1) against
-     every surface in this theme while staying in the same muted blue-gray
-     family, visibly lighter than --text-secondary. */
-  --text-muted: #527093;
-  --accent: #0d9488;
-  --accent-text: #115e59;
-  --accent-strong: #0d9488;
-  --accent-soft: rgba(13, 148, 136, 0.1);
-  --shadow-card: 0 1px 2px rgba(15, 38, 71, 0.05), 0 8px 24px rgba(15, 38, 71, 0.06);
-  --card-blur: blur(12px);
 }
 
 /* ---- Tailwind theme mapping ----
@@ -132,7 +130,8 @@ h3,
 h4,
 .type-display,
 .type-h2,
-.type-h3 {
+.type-h3,
+.type-h4 {
   font-family: var(--font-display), sans-serif;
   color: var(--text);
 }
@@ -142,15 +141,9 @@ h4,
   position: fixed;
   inset: 0;
   z-index: -1;
-  background:
-    radial-gradient(ellipse 120% 80% at 50% -10%, var(--bg-grad-top) 0%, transparent 60%),
-    linear-gradient(180deg, var(--bg) 0%, var(--bg-grad-mid) 45%, var(--bg-grad-bottom) 100%);
-}
-
-:root[data-theme="light"] .bg-gradient-layer {
-  /* Opacity dropped from 0.55 to 0.18 to match the lighter, whiter palette
-     above — this glow should read as a hint of warmth behind the hero, not
-     a visible peach patch. */
+  /* The warm radial is held at 0.18 opacity to match the pale palette above:
+     it should read as a hint of warmth behind the hero, not a visible peach
+     patch. */
   background:
     radial-gradient(ellipse 100% 60% at 50% 0%, rgba(255, 214, 175, 0.18) 0%, transparent 65%),
     linear-gradient(
@@ -160,6 +153,13 @@ h4,
       var(--bg-grad-lower) 70%,
       var(--bg-grad-bottom) 100%
     );
+}
+
+/* Dark's three-stop variant — see the token-asymmetry note above. */
+:root[data-theme="dark"] .bg-gradient-layer {
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -10%, var(--bg-grad-top) 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-grad-mid) 45%, var(--bg-grad-bottom) 100%);
 }
 
 /* ---- Type scale ----
@@ -178,6 +178,15 @@ h4,
   line-height: 0.95;
 }
 
+/* .type-display is sized for short, punchy strings — a two-word name, "Let's
+   talk." At 5.5rem a full sentence becomes unreadable, so the hero headline
+   (which is now a complete sentence, not the name) steps the ceiling down and
+   opens the leading back up. Pair it with a max-w-[20ch] on the element. */
+.type-display--sentence {
+  font-size: clamp(2.25rem, 5.5vw, 4rem);
+  line-height: 1.05;
+}
+
 .type-h2 {
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 600;
@@ -188,6 +197,16 @@ h4,
 .type-h3 {
   font-size: 1.5rem;
   font-weight: 600;
+}
+
+/* Fourth heading level, introduced for the Problem/Solution/Results/The flow
+   subheaders inside a work block. Deliberately small and wide-tracked rather
+   than just "a smaller h3" — at this level it's labelling a passage, so it
+   should read closer to the mono eyebrows than to a title. */
+.type-h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .type-lead {
@@ -224,6 +243,17 @@ h4,
   font-size: clamp(2.25rem, 4.5vw, 3.5rem);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
+}
+
+/* The 01-07 markers in the "How I work" section. Quiet by design (--text-muted,
+   not accent): the step titles carry the content, the numerals only encode
+   that this is an ordered sequence. */
+.type-step-number {
+  font-family: var(--font-mono), monospace;
+  font-size: 1.75rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
 }
 
 .type-node-label {

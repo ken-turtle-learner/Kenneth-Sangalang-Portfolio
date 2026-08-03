@@ -28,7 +28,12 @@ function highlightNumbers(text: string): React.ReactNode {
 // Server Component: purely presentational, no interactivity.
 export default function ExperienceTimeline() {
   return (
-    <Section id="experience" label="Experience" heading="Where the numbers came from">
+    <Section
+      id="experience"
+      label="Experience"
+      heading="Where the numbers came from"
+      intro="The roles behind the projects above, in-house and freelance."
+    >
       <div className="mt-10 space-y-12 border-l border-border pl-8">
         <Reveal index={0}>
           <div className="relative">

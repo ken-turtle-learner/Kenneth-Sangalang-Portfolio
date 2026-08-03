@@ -8,7 +8,7 @@
 // source material didn't actually say anything, rather than padded out.
 
 // A single automation-canvas node: one box in the ActiveCampaign/Zapier-
-// style diagram (see components/AutomationCanvas, built in Phase 4).
+// style diagram (see components/AutomationCanvas).
 export type AutomationNode = {
   id: string;
   kind: "trigger" | "email" | "wait" | "goal";
@@ -33,10 +33,30 @@ export type CanvasStep = AutomationNode | AutomationBranch;
 // "Result vs. industry median" row (used where there's no real before-state
 // to compare against, e.g. CS2/CS4 — comparing against a benchmark is the
 // honest framing there instead of a fabricated Before column).
-export type BenchmarkRow = { label: string; result: string; comparison: string };
+//
+// `resultValue`/`comparisonValue` are numeric twins of the display strings,
+// used by components/BenchmarkPanel.tsx to size its bars. They exist because
+// the old Proof section hardcoded those same numbers as literals while
+// reading the strings from here — so editing this file silently didn't move
+// the bars. Keep each pair in sync.
+export type BenchmarkRow = {
+  label: string;
+  result: string;
+  comparison: string;
+  resultValue: number;
+  comparisonValue?: number;
+};
+
 // "Before -> After" row (used only for CS1, which is the one case study
 // with a genuine pre-launch baseline — see the 48% note above).
-export type BeforeAfterRow = { label: string; before: string; after: string; delta: string };
+export type BeforeAfterRow = {
+  label: string;
+  before: string;
+  after: string;
+  delta: string;
+  beforeValue: number;
+  afterValue: number;
+};
 
 export type Figure = { src: string; alt: string; caption: string };
 
@@ -48,16 +68,16 @@ export type QuickFacts = {
   impact: string;
 };
 
-// One case study, driving both its home-page card and its /work/[slug]
+// One case study, driving both its home-page work block and its /work/[slug]
 // page. `process` and `learnings` are optional and intentionally omitted
 // on studies where the source docs didn't give real material — the
-// /work/[slug] page (Phase 5) should skip rendering those sections rather
-// than show empty headings.
+// /work/[slug] page skips rendering those sections rather than showing
+// empty headings.
 export type CaseStudy = {
   slug: string;
   discipline: string;
   title: string;
-  // One-liner for the home page card.
+  // One-liner for the home page work block.
   cardOutcome: string;
   // Fuller framing sentence for the case study page's lead paragraph.
   leadOutcome: string;
@@ -68,8 +88,8 @@ export type CaseStudy = {
   problem: string;
   process?: string[];
   solution: string;
-  // Which results table shape to render — see BenchmarkRow/BeforeAfterRow
-  // above for why this varies per case study instead of being uniform.
+  // Which results shape to render — see BenchmarkRow/BeforeAfterRow above
+  // for why this varies per case study instead of being uniform.
   resultsType: "benchmark" | "before-after" | "operational";
   benchmarkResults?: BenchmarkRow[];
   beforeAfterResults?: BeforeAfterRow[];
@@ -86,9 +106,15 @@ export type CaseStudy = {
   creditLine?: string;
 };
 
-// Ordered to match the plan's featured-work order: CS1 leads because it's
-// the one fully attributable to Kenneth end-to-end (strategy, copy, build,
-// and a real measured result), per his own career profile notes.
+// Array order is display order, on the home page and for the prev/next links
+// on /work/[slug].
+//
+// The re-engagement campaign leads because it's the one project attributable
+// to Kenneth end to end — strategy, copy, build, QA, and a real measured
+// result. The WordPress/REST build follows so the two most technical and the
+// two most marketing-side studies alternate, and the 11-email sequence sits
+// last: it's the strongest single number on the site, but leading with it (as
+// this list used to) made the whole portfolio read as an email specialist's.
 export const caseStudies: CaseStudy[] = [
   // CS1 — the only case study with a genuine pre-launch baseline (48%,
   // confirmed by Kenneth directly rather than sourced from the docs), so
@@ -96,7 +122,10 @@ export const caseStudies: CaseStudy[] = [
   // benchmark comparison.
   {
     slug: "so-tool-reengagement",
-    discipline: "Email Marketing · Lifecycle Automation",
+    // Lifecycle/segmentation leads the label because that's what the build
+    // actually was; "Email Marketing" stays because the send itself genuinely
+    // was an email campaign, and dropping it would overcorrect into inaccuracy.
+    discipline: "Lifecycle Automation · Email Marketing",
     title: "Getting leads from 48% to 63% completion on a self-discovery tool",
     cardOutcome: "A re-engagement campaign that lifted lead-magnet completion by 15 points.",
     leadOutcome:
@@ -117,7 +146,16 @@ export const caseStudies: CaseStudy[] = [
     solution:
       "Wrote short re-engagement copy and built the segmentation and trigger logic in ActiveCampaign: entries who went inactive after starting the tool were branched into a re-engagement send, then routed to completion or exited from the flow. QA tested end to end before launch.",
     resultsType: "before-after",
-    beforeAfterResults: [{ label: "SO Tool completion rate", before: "48%", after: "63%", delta: "+15 pts" }],
+    beforeAfterResults: [
+      {
+        label: "SO Tool completion rate",
+        before: "48%",
+        after: "63%",
+        delta: "+15 pts",
+        beforeValue: 48,
+        afterValue: 63,
+      },
+    ],
     roleAttribution:
       "Kenneth owned this end to end: wrote the copy, designed the segmentation and trigger logic, QA tested, and launched. This campaign sits just upstream of the 11-email 'SO Tool to LE Pitch' nurture sequence — together they're one connected funnel: reactivate → nurture → convert.",
     canvas: [
@@ -136,65 +174,35 @@ export const caseStudies: CaseStudy[] = [
     ],
   },
   {
-    slug: "so-tool-to-le-pitch",
-    discipline: "Email Automation · Lifecycle Marketing",
-    title: "An 11-email nurture sequence at a 50.78% open rate",
-    cardOutcome: "11 emails, above benchmark on every open/click metric, zero list attrition.",
-    leadOutcome: "705 sends across 11 emails, a 50.78% open rate, and zero bounces or unsubscribes over a full year.",
-    headlineMetric: "50.78% open",
-    tags: ["ActiveCampaign", "Segmentation", "Email Design", "Sequencing Logic"],
+    slug: "course-platform-api",
+    discipline: "Backend / Systems",
+    title: "Killing manual enrollment with custom WordPress REST endpoints",
+    cardOutcome: "Custom REST endpoints and a FastAPI tool that replaced manual course enrollment.",
+    leadOutcome:
+      "Secure custom WordPress REST endpoints that auto-enroll students on purchase, a FastAPI internal tool, and a coaching-portal build for Brave Leadership's AI-powered Super Objective quiz.",
+    headlineMetric: "7 courses · 50 students",
+    tags: ["WordPress REST", "FastAPI", "Zapier", "Webhooks"],
     quickFacts: {
-      role: "Automation build, QA, segmentation, subject lines & design — body copy by another writer",
+      role: "Backend endpoints & automation end-to-end; contributed to the coaching-portal build",
       company: "Brave Leadership",
-      timeline: "Aug 2025 – Aug 2026 (12 months)",
-      team: "Kenneth + 1 copywriter",
-      impact: "50.78% open · 3.83% click · 0% bounce/unsub",
+      timeline: "11/2020 – 06/2026",
+      team: "Kenneth (endpoints); Kenneth + product team (coaching portal)",
+      impact: "7 courses · 50 students · manual enrollment eliminated",
     },
     overview:
-      "\"SO Tool to LE Pitch\" is an 11-email sequence that nurtures leads who completed the Super Objective (SO) self-discovery tool toward Leadership Essentials (LE), Brave Leadership's paid program. The sender voice reads as a trusted mentor, not a marketer.",
+      "Brave Leadership's course portal (WordPress + LearnDash + WooCommerce) supports 7 courses and 50 students. Every purchase used to require manual enrollment.",
     problem:
-      "Converting a self-discovery-tool lead into a paying customer without the sequence reading as a hard sell — trust has to be built before the pitch, not assumed.",
-    process: [
-      "The throughline across all 11 emails is authentic leadership, self-investment, and shared mission — urgency is introduced only in the final email, a deadline close ('special something ends tonight') with a midnight cutoff.",
-      "This sequence sits downstream of a separate re-engagement campaign (see the SO Tool re-engagement case study) that feeds it volume — together they form one connected funnel: reactivate → nurture → convert.",
-    ],
+      "Purchase data lived in WooCommerce but enrollment in LearnDash was a manual step after every sale — a growing operational bottleneck as course volume increased.",
     solution:
-      "Built and implemented the full automation in ActiveCampaign: entry trigger on SO Tool completion, 11 email sends with wait steps between them, and a purchase goal. Owned segmentation, subject lines, pre-header text, and email design; QA'd the entire sequence before and after launch.",
-    resultsType: "benchmark",
-    benchmarkResults: [
-      { label: "Open rate", result: "50.78%", comparison: "median 33.78% · ▲ +17.0 pts" },
-      { label: "Click rate", result: "3.83%", comparison: "median 1.37% · ▲ +2.46 pts" },
-      { label: "Click-to-open rate", result: "7.54%", comparison: "—" },
-      { label: "Bounce rate", result: "0%", comparison: "705 sends, 12 months" },
-      { label: "Unsubscribe rate", result: "0%", comparison: "705 sends, 12 months" },
+      "Built secure custom WordPress REST API endpoints to sync purchase data and auto-enroll students, plus Zapier/webhook integrations across platforms to streamline the wider enrollment workflow. Also built a full-stack internal tool (FastAPI backend with authentication and rate limiting, deployed on Render) to support the course platform. Separately, contributed to Brave Leadership's Super Objective coaching portal — an AI/LLM-powered, multi-step quiz that generates a personalized impact statement, originally built on Bubble.io and migrated to a full-stack web app — helping build the new coaching-portal addition and some of its API endpoints, with Claude Code assisting on syntax.",
+    resultsType: "operational",
+    metricsNote:
+      "The outcome here is operational, not a conversion metric: manual enrollment processing was eliminated after every purchase.",
+    learnings: [
+      "Contributing to the coaching-portal build and its API endpoints is where a lot of the system-design intuition for this kind of work came from.",
     ],
     roleAttribution:
-      "Body copy for this sequence was written by someone else. Kenneth built and implemented the automation in ActiveCampaign, QA'd and tested it end to end, and owned segmentation, subject lines, pre-header text, email design, and sequencing logic.",
-    canvas: [
-      { id: "trigger", kind: "trigger", label: "TRIGGER", title: "SO Tool completed" },
-      { id: "email-1", kind: "email", label: "EMAIL 1", title: "Welcome / opening" },
-      { id: "wait-1", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-2", kind: "email", label: "EMAIL 2", title: "Nurture" },
-      { id: "wait-2", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-3", kind: "email", label: "EMAIL 3", title: "Nurture" },
-      { id: "wait-3", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-4", kind: "email", label: "EMAIL 4", title: "Nurture" },
-      { id: "wait-4", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-5", kind: "email", label: "EMAIL 5", title: "Nurture" },
-      { id: "wait-5", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-6", kind: "email", label: "EMAIL 6", title: "Nurture" },
-      { id: "wait-6", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-7", kind: "email", label: "EMAIL 7", title: "Nurture" },
-      { id: "wait-7", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-8", kind: "email", label: "EMAIL 8", title: "Nurture" },
-      { id: "wait-8", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-9", kind: "email", label: "EMAIL 9", title: "Nurture" },
-      { id: "wait-9", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-10", kind: "email", label: "EMAIL 10", title: "Nurture" },
-      { id: "wait-10", kind: "wait", label: "WAIT", title: "Final interval" },
-      { id: "email-11", kind: "email", label: "EMAIL 11", title: "Deadline close — midnight cutoff" },
-      { id: "goal", kind: "goal", label: "GOAL", title: "Leadership Essentials purchase" },
-    ],
+      "Kenneth built the WordPress REST endpoints and enrollment automation described above end to end. On the separate Super Objective coaching-portal product, he helped build the new coaching-portal addition and some of the API endpoints — with Claude Code assisting on syntax — but did not architect the original quiz product or its AI pipeline.",
   },
   {
     slug: "so-tool-onboarding-flow",
@@ -236,35 +244,77 @@ export const caseStudies: CaseStudy[] = [
     creditLine: "Super Objective™ is a trademark of Brave Leadership.",
   },
   {
-    slug: "course-platform-api",
-    discipline: "Backend / Systems",
-    title: "Killing manual enrollment with custom WordPress REST endpoints",
-    cardOutcome: "Custom REST endpoints and a FastAPI tool that replaced manual course enrollment.",
-    leadOutcome:
-      "Secure custom WordPress REST endpoints that auto-enroll students on purchase, a FastAPI internal tool, and a coaching-portal build for Brave Leadership's AI-powered Super Objective quiz.",
-    headlineMetric: "7 courses · 50 students",
-    tags: ["WordPress REST", "FastAPI", "Zapier", "Webhooks"],
+    slug: "so-tool-to-le-pitch",
+    discipline: "Email Automation · Lifecycle Marketing",
+    title: "An 11-email nurture sequence at a 50.78% open rate",
+    cardOutcome: "11 emails, above benchmark on every open/click metric, zero list attrition.",
+    leadOutcome: "705 sends across 11 emails, a 50.78% open rate, and zero bounces or unsubscribes over a full year.",
+    headlineMetric: "50.78% open",
+    tags: ["ActiveCampaign", "Segmentation", "Email Design", "Sequencing Logic"],
     quickFacts: {
-      role: "Backend endpoints & automation end-to-end; contributed to the coaching-portal build",
+      role: "Automation build, QA, segmentation, subject lines & design — body copy by another writer",
       company: "Brave Leadership",
-      timeline: "11/2020 – 06/2026",
-      team: "Kenneth (endpoints); Kenneth + product team (coaching portal)",
-      impact: "7 courses · 50 students · manual enrollment eliminated",
+      timeline: "Aug 2025 – Aug 2026 (12 months)",
+      team: "Kenneth + 1 copywriter",
+      impact: "50.78% open · 3.83% click · 0% bounce/unsub",
     },
     overview:
-      "Brave Leadership's course portal (WordPress + LearnDash + WooCommerce) supports 7 courses and 50 students. Every purchase used to require manual enrollment.",
+      "\"SO Tool to LE Pitch\" is an 11-email sequence that nurtures leads who completed the Super Objective (SO) self-discovery tool toward Leadership Essentials (LE), Brave Leadership's paid program. The sender voice reads as a trusted mentor, not a marketer.",
     problem:
-      "Purchase data lived in WooCommerce but enrollment in LearnDash was a manual step after every sale — a growing operational bottleneck as course volume increased.",
+      "Converting a self-discovery-tool lead into a paying customer without the sequence reading as a hard sell — trust has to be built before the pitch, not assumed.",
+    process: [
+      "The throughline across all 11 emails is authentic leadership, self-investment, and shared mission — urgency is introduced only in the final email, a deadline close ('special something ends tonight') with a midnight cutoff.",
+      "This sequence sits downstream of a separate re-engagement campaign (see the SO Tool re-engagement case study) that feeds it volume — together they form one connected funnel: reactivate → nurture → convert.",
+    ],
     solution:
-      "Built secure custom WordPress REST API endpoints to sync purchase data and auto-enroll students, plus Zapier/webhook integrations across platforms to streamline the wider enrollment workflow. Also built a full-stack internal tool (FastAPI backend with authentication and rate limiting, deployed on Render) to support the course platform. Separately, contributed to Brave Leadership's Super Objective coaching portal — an AI/LLM-powered, multi-step quiz that generates a personalized impact statement, originally built on Bubble.io and migrated to a full-stack web app — helping build the new coaching-portal addition and some of its API endpoints, with Claude Code assisting on syntax.",
-    resultsType: "operational",
-    metricsNote:
-      "The outcome here is operational, not a conversion metric: manual enrollment processing was eliminated after every purchase.",
-    learnings: [
-      "Contributing to the coaching-portal build and its API endpoints is where a lot of the system-design intuition for this kind of work came from.",
+      "Built and implemented the full automation in ActiveCampaign: entry trigger on SO Tool completion, 11 email sends with wait steps between them, and a purchase goal. Owned segmentation, subject lines, pre-header text, and email design; QA'd the entire sequence before and after launch.",
+    resultsType: "benchmark",
+    benchmarkResults: [
+      {
+        label: "Open rate",
+        result: "50.78%",
+        comparison: "median 33.78% · ▲ +17.0 pts",
+        resultValue: 50.78,
+        comparisonValue: 33.78,
+      },
+      {
+        label: "Click rate",
+        result: "3.83%",
+        comparison: "median 1.37% · ▲ +2.46 pts",
+        resultValue: 3.83,
+        comparisonValue: 1.37,
+      },
+      { label: "Click-to-open rate", result: "7.54%", comparison: "—", resultValue: 7.54 },
+      { label: "Bounce rate", result: "0%", comparison: "705 sends, 12 months", resultValue: 0 },
+      { label: "Unsubscribe rate", result: "0%", comparison: "705 sends, 12 months", resultValue: 0 },
     ],
     roleAttribution:
-      "Kenneth built the WordPress REST endpoints and enrollment automation described above end to end. On the separate Super Objective coaching-portal product, he helped build the new coaching-portal addition and some of the API endpoints — with Claude Code assisting on syntax — but did not architect the original quiz product or its AI pipeline.",
+      "Body copy for this sequence was written by someone else. Kenneth built and implemented the automation in ActiveCampaign, QA'd and tested it end to end, and owned segmentation, subject lines, pre-header text, email design, and sequencing logic.",
+    canvas: [
+      { id: "trigger", kind: "trigger", label: "TRIGGER", title: "SO Tool completed" },
+      { id: "email-1", kind: "email", label: "EMAIL 1", title: "Welcome / opening" },
+      { id: "wait-1", kind: "wait", label: "WAIT", title: "Between-send interval" },
+      { id: "email-2", kind: "email", label: "EMAIL 2", title: "Nurture" },
+      { id: "wait-2", kind: "wait", label: "WAIT", title: "Between-send interval" },
+      { id: "email-3", kind: "email", label: "EMAIL 3", title: "Nurture" },
+      { id: "wait-3", kind: "wait", label: "WAIT", title: "Between-send interval" },
+      { id: "email-4", kind: "email", label: "EMAIL 4", title: "Nurture" },
+      { id: "wait-4", kind: "wait", label: "WAIT", title: "Between-send interval" },
+      { id: "email-5", kind: "email", label: "EMAIL 5", title: "Nurture" },
+      { id: "wait-5", kind: "wait", label: "WAIT", title: "Between-send interval" },
+      { id: "email-6", kind: "email", label: "EMAIL 6", title: "Nurture" },
+      { id: "wait-6", kind: "wait", label: "WAIT", title: "Between-send interval" },
+      { id: "email-7", kind: "email", label: "EMAIL 7", title: "Nurture" },
+      { id: "wait-7", kind: "wait", label: "WAIT", title: "Between-send interval" },
+      { id: "email-8", kind: "email", label: "EMAIL 8", title: "Nurture" },
+      { id: "wait-8", kind: "wait", label: "WAIT", title: "Between-send interval" },
+      { id: "email-9", kind: "email", label: "EMAIL 9", title: "Nurture" },
+      { id: "wait-9", kind: "wait", label: "WAIT", title: "Between-send interval" },
+      { id: "email-10", kind: "email", label: "EMAIL 10", title: "Nurture" },
+      { id: "wait-10", kind: "wait", label: "WAIT", title: "Final interval" },
+      { id: "email-11", kind: "email", label: "EMAIL 11", title: "Deadline close — midnight cutoff" },
+      { id: "goal", kind: "goal", label: "GOAL", title: "Leadership Essentials purchase" },
+    ],
   },
 ];
 

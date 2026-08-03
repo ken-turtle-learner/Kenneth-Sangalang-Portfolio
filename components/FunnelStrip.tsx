@@ -3,7 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import CanvasNode from "@/components/CanvasNode";
 import { observeReveal } from "@/lib/observer";
-import { funnelStripSteps } from "@/content/case-studies";
+import type { AutomationNode } from "@/content/case-studies";
+
+type FunnelStripProps = {
+  steps: AutomationNode[];
+  // Accessible name for the strip's screen-reader text equivalent.
+  label: string;
+};
 
 // Horizontal arrowhead — hoisted per rendering-hoist-jsx, same reasoning as
 // AutomationCanvas's vertical one.
@@ -20,12 +26,15 @@ function Connector({ index }: { index: number }) {
   );
 }
 
-// The compact, home-page variant of the automation canvas: one horizontal
-// row telling the connected-funnel story (re-engagement -> SO Tool
-// completed -> 11-email nurture -> Leadership Essentials) across all four
-// case studies. Wrapped in overflow-x-auto so a narrow viewport scrolls the
-// strip itself instead of widening the page.
-export default function FunnelStrip() {
+// The horizontal variant of the automation canvas: one row of nodes telling a
+// left-to-right story. Used on the home page for the connected funnel
+// (re-engagement -> SO Tool completed -> 11-email nurture -> Leadership
+// Essentials) that spans all four case studies. Wrapped in overflow-x-auto so
+// a narrow viewport scrolls the strip itself instead of widening the page.
+//
+// Takes its steps as a prop rather than importing them, so the component is
+// about the *shape* (a horizontal rail) rather than about one specific funnel.
+export default function FunnelStrip({ steps, label }: FunnelStripProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
 
@@ -45,15 +54,15 @@ export default function FunnelStrip() {
     // 375px before this was added.
     <div ref={ref} className={`funnel-strip min-w-0 ${active ? "funnel-strip--active" : ""}`}>
       <div aria-hidden="true" className="flex min-w-0 items-center overflow-x-auto pb-2">
-        {funnelStripSteps.map((step, index) => (
+        {steps.map((step, index) => (
           <div key={step.id} className="flex shrink-0 items-center">
             <CanvasNode node={step} index={index} className="w-40" />
-            {index < funnelStripSteps.length - 1 ? <Connector index={index} /> : null}
+            {index < steps.length - 1 ? <Connector index={index} /> : null}
           </div>
         ))}
       </div>
-      <ol className="sr-only" aria-label="Full funnel: reactivation through conversion">
-        {funnelStripSteps.map((step) => (
+      <ol className="sr-only" aria-label={label}>
+        {steps.map((step) => (
           <li key={step.id}>
             {step.label} — {step.title}
           </li>

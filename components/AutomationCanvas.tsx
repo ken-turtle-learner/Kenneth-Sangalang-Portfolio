@@ -10,6 +10,11 @@ type AutomationCanvasProps = {
   // Accessible label for the canvas as a whole, e.g. "Re-engagement trigger
   // logic" — read by screen readers before the text-equivalent list.
   label: string;
+  // Collapses long runs of identical steps into a single summary node (see
+  // collapseRuns below). Used on the home page, where the 11-email sequence's
+  // 23-step canvas would otherwise render a ~2000px column; the /work/[slug]
+  // page leaves this off and draws every step.
+  compact?: boolean;
 };
 
 // A connector line + arrowhead is identical everywhere it appears, so it's
@@ -42,6 +47,73 @@ function buildRenderSequence(nodes: AutomationNode[]): RenderItem[] {
   }
 
   return items;
+}
+
+// Compresses a long stretch of identical steps down to first -> summary ->
+// last, so the *shape* of a sequence still reads at a glance without drawing
+// every node. CS2's canvas is trigger + 11 emails + goal; compacted it becomes
+// trigger -> "Welcome / opening" -> "9 more emails" -> "Deadline close" -> goal.
+//
+// Keeping the last node of the run (rather than just truncating) is the point:
+// in an 11-email sequence the final send is the deadline close, which is the
+// one a reader most needs to see.
+//
+// Runs of two are left alone — collapsing them would replace two nodes with
+// two nodes and gain nothing. Wait steps inside a collapsed run are dropped
+// along with it; the summary node already implies elapsed time.
+function collapseRuns(nodes: AutomationNode[]): AutomationNode[] {
+  const result: AutomationNode[] = [];
+  let index = 0;
+
+  while (index < nodes.length) {
+    const node = nodes[index];
+
+    if (node.kind === "wait") {
+      result.push(node);
+      index += 1;
+      continue;
+    }
+
+    // Walk forward over same-kind nodes, stepping over any wait steps
+    // between them (they're rendered on the connectors, not as their own
+    // cards, so they don't break a run).
+    const run: AutomationNode[] = [node];
+    let lastRunIndex = index;
+    let lookahead = index + 1;
+
+    while (lookahead < nodes.length) {
+      const candidate = nodes[lookahead];
+      if (candidate.kind === "wait") {
+        lookahead += 1;
+        continue;
+      }
+      if (candidate.kind !== node.kind) break;
+      run.push(candidate);
+      lastRunIndex = lookahead;
+      lookahead += 1;
+    }
+
+    if (run.length >= 3) {
+      const hidden = run.length - 2;
+      result.push(run[0]);
+      result.push({
+        id: `${run[0].id}-collapsed`,
+        kind: node.kind,
+        label: `+${hidden}`,
+        title: `${hidden} more ${node.kind === "email" ? "emails" : "steps"}`,
+      });
+      result.push(run[run.length - 1]);
+      index = lastRunIndex + 1;
+      continue;
+    }
+
+    // Run too short to be worth collapsing — emit just this node and let the
+    // loop pick up whatever follows (including any wait steps) as normal.
+    result.push(node);
+    index += 1;
+  }
+
+  return result;
 }
 
 // A wait label sits in normal flow beside the arrow (not absolutely
@@ -88,7 +160,7 @@ function describeSteps(steps: CanvasStep[]): string[] {
 // automations (see components/FunnelStrip.tsx for the compact home-page
 // variant). Client Component because activation is scroll-triggered via
 // the shared IntersectionObserver.
-export default function AutomationCanvas({ steps, label }: AutomationCanvasProps) {
+export default function AutomationCanvas({ steps, label, compact = false }: AutomationCanvasProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
 
@@ -99,9 +171,14 @@ export default function AutomationCanvas({ steps, label }: AutomationCanvasProps
   }, []);
 
   const branchIndex = steps.findIndex((step): step is AutomationBranch => step.kind === "branch");
-  const linearSteps = (branchIndex === -1 ? steps : steps.slice(0, branchIndex)) as AutomationNode[];
+  const rawLinearSteps = (branchIndex === -1 ? steps : steps.slice(0, branchIndex)) as AutomationNode[];
+  const linearSteps = compact ? collapseRuns(rawLinearSteps) : rawLinearSteps;
   const branch = branchIndex === -1 ? null : (steps[branchIndex] as AutomationBranch);
   const renderItems = buildRenderSequence(linearSteps);
+  // Rebuilt from the *collapsed* steps, not the original `steps` prop, so the
+  // screen-reader list always describes exactly what's drawn. Reading out all
+  // 11 emails beside a diagram showing 3 would be worse than either alone.
+  const describedSteps: CanvasStep[] = branch ? [...linearSteps, branch] : linearSteps;
 
   return (
     <div ref={ref} className={`automation-canvas ${active ? "automation-canvas--active" : ""}`}>
@@ -152,7 +229,7 @@ export default function AutomationCanvas({ steps, label }: AutomationCanvasProps
       </div>
 
       <ol className="sr-only" aria-label={label}>
-        {describeSteps(steps).map((line, index) => (
+        {describeSteps(describedSteps).map((line, index) => (
           // Keyed by index, not text — a sequence with several "WAIT" steps
           // (see CS2's 11-email canvas) would otherwise produce duplicate
           // keys, since their line text is identical.

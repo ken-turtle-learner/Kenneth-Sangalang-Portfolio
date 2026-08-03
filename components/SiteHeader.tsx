@@ -3,15 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "@/components/Button";
 import ThemeToggle from "@/components/ThemeToggle";
+import { navLinks } from "@/content/nav";
 import { profile } from "@/content/profile";
-
-const NAV_LINKS = [
-  { id: "work", label: "Work" },
-  { id: "experience", label: "Experience" },
-  { id: "skills", label: "Skills" },
-  { id: "about", label: "About" },
-  { id: "contact", label: "Contact" },
-];
 
 const SCROLL_THRESHOLD = 64;
 
@@ -57,7 +50,7 @@ export default function SiteHeader() {
   // active link updates when a section crosses there rather than as soon
   // as any sliver of it appears.
   useEffect(() => {
-    const sections = NAV_LINKS.map((link) => document.getElementById(link.id)).filter(
+    const sections = navLinks.map((link) => document.getElementById(link.id)).filter(
       (el): el is HTMLElement => el !== null,
     );
     if (sections.length === 0) return;
@@ -121,7 +114,7 @@ export default function SiteHeader() {
 
         {/* Desktop nav — hidden below md, replaced by the hamburger button */}
         <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <a
               key={link.id}
               href={`#${link.id}`}
@@ -175,7 +168,7 @@ export default function SiteHeader() {
             <span aria-hidden="true">✕</span>
           </button>
           <nav aria-label="Mobile" className="flex flex-col items-center gap-6">
-            {NAV_LINKS.map((link, index) => (
+            {navLinks.map((link, index) => (
               <a
                 key={link.id}
                 href={`#${link.id}`}
