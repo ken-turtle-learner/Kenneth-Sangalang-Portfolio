@@ -15,12 +15,7 @@ const BENCHMARK_FOOTNOTE = "Brave Leadership · Aug 2025 – Aug 2026 · ActiveC
 // these blocks carry Problem, Solution, and Results on the page itself.
 export default function WorkGrid() {
   return (
-    <Section
-      id="work"
-      label="Featured work"
-      heading="What I actually built"
-      intro="Four projects at Brave Leadership — the problem, the build, and the numbers where numbers exist."
-    >
+    <Section id="work" heading="Featured work">
       <div className="mt-16 flex flex-col gap-16">
         {caseStudies.map((study, index) => (
           <Reveal key={study.slug} index={index}>
