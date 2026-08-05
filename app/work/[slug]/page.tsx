@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import AutomationCanvas from "@/components/AutomationCanvas";
 import ContactCTA from "@/components/ContactCTA";
-import Figure from "@/components/Figure";
+import ExpandableFigure from "@/components/ExpandableFigure";
 import Label from "@/components/Label";
 import QuickFacts from "@/components/QuickFacts";
 import Reveal from "@/components/Reveal";
@@ -67,10 +68,38 @@ export default async function CaseStudyPage(props: PageProps<"/work/[slug]">) {
           ← Back to work
         </Link>
 
+        {/* Header text and the hero mockup share one Reveal so they fade in
+            together and the stagger indices below don't have to shift. */}
         <Reveal index={0}>
-          <Label>{study.discipline}</Label>
-          <h1 className="type-display mt-2 text-4xl md:text-5xl">{study.title}</h1>
-          <p className="type-lead mt-4 max-w-2xl">{study.leadOutcome}</p>
+          <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-12">
+            <div>
+              <Label>{study.discipline}</Label>
+              <h1 className="type-display mt-2 text-4xl md:text-5xl">{study.title}</h1>
+              <p className="type-lead mt-4 max-w-2xl">{study.leadOutcome}</p>
+            </div>
+
+            {/* Rendered inline rather than through Figure.tsx: the mockup is a
+                transparent PNG, so Figure's border would box in empty space.
+                No `order-first` — on mobile the headline should still read
+                before the image. */}
+            {study.heroFigure ? (
+              <figure className="w-[200px] justify-self-center md:w-[240px] md:justify-self-end">
+                <Image
+                  src={study.heroFigure.src}
+                  alt={study.heroFigure.alt}
+                  width={study.heroFigure.width}
+                  height={study.heroFigure.height}
+                  quality={75}
+                  sizes="(min-width: 768px) 240px, 200px"
+                  preload
+                  className="h-auto w-full"
+                />
+                <figcaption className="type-small mt-3 text-center md:text-left">
+                  {study.heroFigure.caption}
+                </figcaption>
+              </figure>
+            ) : null}
+          </div>
         </Reveal>
 
         <Reveal index={1} className="mt-8">
@@ -119,7 +148,7 @@ export default async function CaseStudyPage(props: PageProps<"/work/[slug]">) {
           <div className="mt-8 space-y-8">
             {study.figures.map((figure, figureIndex) => (
               <Reveal key={figure.src} index={figureIndex}>
-                <Figure {...figure} />
+                <ExpandableFigure {...figure} />
               </Reveal>
             ))}
             {study.creditLine ? <p className="type-small mt-4">{study.creditLine}</p> : null}

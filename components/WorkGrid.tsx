@@ -48,7 +48,11 @@ export default function WorkGrid() {
       {/* 2-column grid on desktop, 1-column on mobile */}
       <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2">
         {caseStudies.map((study, index) => (
-          <Reveal key={study.slug} index={index}>
+          // h-full on the Reveal, not just on the card: this div is the grid
+          // item, so it's what stretches to the row height. Without it the
+          // card's own h-full resolves against a shrink-wrapped parent and
+          // the cards keep their ragged bottom edges.
+          <Reveal key={study.slug} index={index} className="h-full">
             <WorkCard study={study} onOpen={() => handleCardOpen(study.slug)} />
           </Reveal>
         ))}

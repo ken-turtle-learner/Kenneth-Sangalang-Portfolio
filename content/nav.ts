@@ -12,7 +12,6 @@ export type NavLink = {
 // longer drift apart.
 export const navLinks: NavLink[] = [
   { id: "work", label: "Work" },
-  { id: "process", label: "Process" },
   { id: "experience", label: "Experience" },
   { id: "about", label: "About" },
   { id: "contact", label: "Contact" },

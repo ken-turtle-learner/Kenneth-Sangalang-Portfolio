@@ -8,8 +8,12 @@ type ButtonProps = {
   className?: string;
 };
 
+// hover-grow (app/globals.css) supplies both the scale-on-hover and the
+// colour transition this used to carry as `transition-colors duration-200` —
+// it has to own the whole transition list, since an unlayered class always
+// beats Tailwind's layered transition-* utilities.
 const BASE =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 font-display text-sm font-medium transition-colors duration-200";
+  "hover-grow inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 font-display text-sm font-medium";
 
 // Primary = solid teal fill (main CTA per screen, used sparingly).
 // Ghost = teal outline only, for secondary actions sitting next to a primary.

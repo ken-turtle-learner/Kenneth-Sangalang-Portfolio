@@ -12,7 +12,9 @@ export default function ContactCard({ platform, handle, href }: ContactCardProps
   return (
     <a
       href={href}
-      className="group flex flex-col rounded-2xl border border-border bg-surface p-6 text-left shadow-(--shadow-card) transition-[transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-accent"
+      // Same hover recipe as WorkCard — see the note there on why the old
+      // transition-[transform,...] never actually eased the lift.
+      className="hover-grow hover-grow--subtle group flex flex-col rounded-2xl border border-border bg-surface p-6 text-left shadow-(--shadow-card) hover:-translate-y-0.5 hover:border-accent"
     >
       <p className="type-label">{platform}</p>
       {/* break-all: the email and the full LinkedIn path both overflow a

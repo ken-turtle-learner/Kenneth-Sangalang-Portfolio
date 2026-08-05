@@ -26,7 +26,7 @@ export default function ThemeToggle() {
       onClick={handleToggle}
       aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
       aria-pressed={!isDark}
-      className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-text-secondary transition-colors duration-200 hover:border-accent hover:text-accent-text"
+      className="hover-grow flex h-11 w-11 items-center justify-center rounded-full border border-border text-text-secondary hover:border-accent hover:text-accent-text"
     >
       {/* Icon is decorative — the button's aria-label carries the meaning */}
       <span aria-hidden="true">{isDark ? "☾" : "☀"}</span>

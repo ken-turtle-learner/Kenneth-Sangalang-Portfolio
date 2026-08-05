@@ -30,7 +30,12 @@ const CONNECTOR_ARROWHEAD = <polygon points="8.0,40.0 16.0,40.0 12.0,44.0" class
 // their own boxed card, per the design spec.
 type RenderItem = { kind: "node"; node: AutomationNode } | { kind: "connector"; waitLabel?: string };
 
-function buildRenderSequence(nodes: AutomationNode[]): RenderItem[] {
+// A wait label renders on the connector *leading into the next node*, so a
+// trailing wait has no connector to attach to and comes back separately.
+// Both canvases end their linear chain with one (trigger -> wait -> branch),
+// where the connector down into the branch is its home — without this the
+// label was silently dropped.
+function buildRenderSequence(nodes: AutomationNode[]): { items: RenderItem[]; trailingWaitLabel?: string } {
   const items: RenderItem[] = [];
   let pendingWaitLabel: string | undefined;
 
@@ -46,7 +51,7 @@ function buildRenderSequence(nodes: AutomationNode[]): RenderItem[] {
     items.push({ kind: "node", node });
   }
 
-  return items;
+  return { items, trailingWaitLabel: pendingWaitLabel };
 }
 
 // Compresses a long stretch of identical steps down to first -> summary ->
@@ -146,11 +151,21 @@ function describeSteps(steps: CanvasStep[]): string[] {
     if (step.kind === "branch") {
       lines.push(`${step.label}: ${step.title}`);
       for (const outcome of step.outcomes) {
-        lines.push(`If ${outcome.label}: ${outcome.nodes.map((n) => `${n.label} — ${n.title}`).join(", ")}`);
+        // One line per node, matching how the top-level steps below are
+        // described. Joining a whole outcome into a single line was fine
+        // while outcomes held one node each, but announces CS4's nurture
+        // path as one unbroken run-on.
+        lines.push(`If ${outcome.label}:`);
+        for (const node of outcome.nodes) {
+          lines.push(`${node.label} — ${node.title}`);
+        }
       }
       continue;
     }
-    lines.push(`${step.label}${step.kind === "wait" ? "" : ` — ${step.title}`}`);
+    // Wait titles are included rather than announcing a bare "WAIT" — their
+    // duration is drawn on the connector, so omitting it here would describe
+    // less than the canvas actually shows.
+    lines.push(`${step.label} — ${step.title}`);
   }
   return lines;
 }
@@ -174,17 +189,35 @@ export default function AutomationCanvas({ steps, label, compact = false }: Auto
   const rawLinearSteps = (branchIndex === -1 ? steps : steps.slice(0, branchIndex)) as AutomationNode[];
   const linearSteps = compact ? collapseRuns(rawLinearSteps) : rawLinearSteps;
   const branch = branchIndex === -1 ? null : (steps[branchIndex] as AutomationBranch);
-  const renderItems = buildRenderSequence(linearSteps);
+  const { items: renderItems, trailingWaitLabel } = buildRenderSequence(linearSteps);
+
+  // Outcome nodes collapse unconditionally — unlike the linear chain above,
+  // which only collapses when `compact` is set. The branch columns are pinned
+  // to a fixed narrow width (see the comment on the outcome row below), so an
+  // uncollapsed 22-node outcome like CS4's nurture path wraps badly on the
+  // full /work/[slug] page too, not just the compact home-page lightbox.
+  // Outcomes of one node are unaffected: a run of 1 never meets collapseRuns'
+  // threshold, so CS1 renders exactly as it did before.
+  const outcomesForRender = branch
+    ? branch.outcomes.map((outcome) => ({ ...outcome, nodes: collapseRuns(outcome.nodes) }))
+    : [];
   // Rebuilt from the *collapsed* steps, not the original `steps` prop, so the
   // screen-reader list always describes exactly what's drawn. Reading out all
   // 11 emails beside a diagram showing 3 would be worse than either alone.
-  const describedSteps: CanvasStep[] = branch ? [...linearSteps, branch] : linearSteps;
+  const describedBranch: AutomationBranch | null = branch ? { ...branch, outcomes: outcomesForRender } : null;
+  const describedSteps: CanvasStep[] = describedBranch ? [...linearSteps, describedBranch] : linearSteps;
 
   return (
     <div ref={ref} className={`automation-canvas ${active ? "automation-canvas--active" : ""}`}>
       {/* Visual canvas — hidden from assistive tech; describeSteps() below
           is the real accessible content for this component. */}
-      <div aria-hidden="true" className="mx-auto flex max-w-xs flex-col items-center overflow-x-auto">
+      {/* w-full + max-w-md: 448px on desktop (was a 320px max-w-xs, too narrow
+          to split into two readable branch columns), shrinking to whatever the
+          host gives it on mobile — the lightbox panel is the tight case at
+          ~280px inside its own padding. No overflow-x-auto: nothing in here is
+          unshrinkable now that the nodes wrap, and a scroll container would
+          clip the activation pulse's box-shadow (see canvas-node-pulse). */}
+      <div aria-hidden="true" className="mx-auto flex w-full max-w-md flex-col items-center">
         {renderItems.map((item, index) =>
           item.kind === "node" ? (
             <CanvasNode key={item.node.id} node={item.node} index={index} className="w-full" />
@@ -195,34 +228,58 @@ export default function AutomationCanvas({ steps, label, compact = false }: Auto
 
         {branch ? (
           <>
-            <Connector index={renderItems.length} />
+            <Connector index={renderItems.length} waitLabel={trailingWaitLabel} />
             <div
               className="canvas-node w-full"
               style={{ "--i": renderItems.length + 1 } as React.CSSProperties}
             >
               <p className="type-node-label text-accent-text">{branch.label}</p>
-              <p className="type-h3 mt-1 text-base">{branch.title}</p>
+              {/* Matches CanvasNode's title line exactly — this header is a
+                  .canvas-node drawn inline rather than through that component. */}
+              <p className="type-node-title mt-1">{branch.title}</p>
             </div>
-            {/* Fixed narrow width per column (not w-full like the linear
-                chain above) — two w-full columns side by side would each
-                try to claim the full max-w-xs canvas width and overflow it.
-                Verified overflowing/clipped on both branch outcomes before
-                this width constraint was added. */}
-            <div className="mt-2 flex justify-center gap-6">
-              {branch.outcomes.map((outcome, outcomeIndex) => (
-                <div key={outcome.label} className="flex w-32 flex-col items-center">
-                  <p className="type-tag mt-2 text-text-muted">IF {outcome.label.toUpperCase()}</p>
-                  <Connector index={renderItems.length + 2} />
-                  {outcome.nodes.map((node, nodeIndex) => (
-                    <CanvasNode
-                      key={node.id}
-                      node={node}
-                      index={renderItems.length + 3 + outcomeIndex + nodeIndex}
-                      className="w-full"
-                    />
-                  ))}
-                </div>
-              ))}
+            {/* The columns must be width-constrained, not w-full like the
+                linear chain above — two w-full columns side by side would each
+                claim the whole canvas width and overflow it (verified clipped
+                on both outcomes before any constraint was here). This splits
+                the canvas evenly instead of pinning a fixed w-32: that fixed
+                128px left only an ~88px content box after node padding, which
+                is what the titles were spilling out of. */}
+            <div className="mt-2 flex gap-3 sm:gap-6">
+              {outcomesForRender.map((outcome, outcomeIndex) => {
+                // Same buildRenderSequence pass the linear chain gets, so wait
+                // steps become connector labels here too instead of their own
+                // boxed cards. Before this, outcomes bypassed the pipeline
+                // entirely — invisible while every outcome held a single node.
+                const { items: outcomeItems } = buildRenderSequence(outcome.nodes);
+                return (
+                  // flex-1 basis-0 makes both outcomes equal halves of the
+                  // canvas regardless of content; min-w-0 is what actually
+                  // lets them shrink below their content width on narrow
+                  // viewports — without it a flex item's min-width:auto floor
+                  // reintroduces the same overflow.
+                  <div key={outcome.label} className="flex min-w-0 flex-1 basis-0 flex-col items-center">
+                    <p className="type-tag mt-2 text-text-muted">IF {outcome.label.toUpperCase()}</p>
+                    <Connector index={renderItems.length + 2} />
+                    {outcomeItems.map((item, itemIndex) =>
+                      item.kind === "node" ? (
+                        <CanvasNode
+                          key={item.node.id}
+                          node={item.node}
+                          index={renderItems.length + 3 + outcomeIndex + itemIndex}
+                          className="w-full"
+                        />
+                      ) : (
+                        <Connector
+                          key={`outcome-${outcomeIndex}-connector-${itemIndex}`}
+                          index={renderItems.length + 3 + outcomeIndex + itemIndex}
+                          waitLabel={item.waitLabel}
+                        />
+                      ),
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </>
         ) : null}

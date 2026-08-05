@@ -157,6 +157,9 @@ export default function WorkLightbox({ study, onClose, benchmarkFootnote }: Work
             </div>
           ) : study.figures ? (
             <div className="space-y-4">
+              {/* Only for studies whose screenshot *is* the flow (CS4) — elsewhere
+                  the figure captions already label themselves. */}
+              {study.visualHeading ? <h3 className="type-h3 mb-4">{study.visualHeading}</h3> : null}
               {study.figures.map((figure) => (
                 <Figure key={figure.src} {...figure} />
               ))}

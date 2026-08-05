@@ -9,9 +9,15 @@
 
 // A single automation-canvas node: one box in the ActiveCampaign/Zapier-
 // style diagram (see components/AutomationCanvas).
+//
+// "exit" is a path that leaves the automation without converting — CS4's
+// suppression branch routes already-purchased contacts out to other
+// automations. It exists as its own kind because "goal" carries permanent
+// teal highlight styling (see CanvasNode/.canvas-node--goal), which would
+// read that dead end as a win.
 export type AutomationNode = {
   id: string;
-  kind: "trigger" | "email" | "wait" | "goal";
+  kind: "trigger" | "email" | "wait" | "goal" | "exit";
   label: string;
   title: string;
   metric?: string;
@@ -58,7 +64,23 @@ export type BeforeAfterRow = {
   afterValue: number;
 };
 
-export type Figure = { src: string; alt: string; caption: string };
+// `width`/`height` are the image's real pixel dimensions. They're optional and
+// default to 1200x750 in components/Figure.tsx, but every real screenshot here
+// should set them: Figure sizes its box from these, so a wrong ratio means the
+// object-fit crops the screenshot rather than showing all of it.
+export type Figure = {
+  src: string;
+  alt: string;
+  caption: string;
+  width?: number;
+  height?: number;
+  // Renders this figure at reduced width on the case study page instead of
+  // letting it span the full container. Set only where the image would
+  // otherwise swamp the page — CS1's automation screenshot sits directly under
+  // an already-full-width AutomationCanvas, so two big flow diagrams stack up.
+  // The full-size image is still one click away via components/ExpandableFigure.
+  thumbnail?: boolean;
+};
 
 export type QuickFacts = {
   role: string;
@@ -103,6 +125,30 @@ export type CaseStudy = {
   roleAttribution: string;
   canvas?: CanvasStep[];
   figures?: Figure[];
+  // The visual that renders beside the header on /work/[slug] — currently CS1's
+  // phone mockup. Deliberately kept out of `figures` rather than added as its
+  // first entry: WorkCard reads figures[cardFigureIndex ?? 0] for the home-grid
+  // thumbnail and WorkLightbox maps the whole array, so a new entry there would
+  // silently change both surfaces. Rendered directly by the page, not through
+  // components/Figure.tsx, since the mockup is a transparent PNG and Figure's
+  // border would draw a box around empty space.
+  heroFigure?: Figure;
+  // Heading over the lightbox's figure block, for studies whose screenshot *is*
+  // the flow (CS4 shows the real ActiveCampaign canvas, so it gets "The flow"
+  // just like the drawn canvases do). Left undefined where the figures are
+  // ordinary screenshots and their captions already say enough.
+  visualHeading?: string;
+  // Which visual the Featured Work grid card shows. Defaults to the first
+  // figure when one exists, falling back to the headlineMetric tile. CS4 pins
+  // "metric" because its figure is a dense automation screenshot that reads as
+  // unreadable chrome at thumbnail size, while "50.78% open" lands instantly.
+  cardVisual?: "figure" | "metric";
+  // Which figure the Featured Work card shows, when it shouldn't be the first
+  // one. Defaults to 0. CS3's figures run in flow order (welcome first), but
+  // the welcome screen is a paragraph of text at thumbnail size — the reframe
+  // screen is the frame that shows the conditional payoff, so its card points
+  // at that one instead without disturbing the flow order everywhere else.
+  cardFigureIndex?: number;
   creditLine?: string;
 };
 
@@ -158,11 +204,24 @@ export const caseStudies: CaseStudy[] = [
     ],
     roleAttribution:
       "Kenneth owned this end to end: wrote the copy, designed the segmentation and trigger logic, QA tested, and launched. This campaign sits just upstream of the 11-email 'SO Tool to LE Pitch' nurture sequence — together they're one connected funnel: reactivate → nurture → convert.",
+    heroFigure: {
+      src: "/work/so-tool-reengagement/reengagement-mockup.png",
+      alt: "The re-engagement automation on a phone screen: wait for 5 minutes, then wait until the Needs a nudge tag exists, then send the Super Objective re-engagement email titled 'Did you get stuck?' — reporting 58 sent, 39.7% open rate, 10.3% click rate — then wait until the Disengaged tag exists before a second send",
+      caption: "The live automation on mobile — 39.7% open rate, 10.3% click rate on the nudge email",
+      width: 1080,
+      height: 1920,
+    },
     figures: [
       {
         src: "/work/so-tool-reengagement/automation-flow.png",
         alt: "ActiveCampaign automation showing wait-until-tag-exists steps for Needs a nudge, Disengaged, and Inactive, each branching into a Super Objective re-engagement email",
         caption: "The re-engagement automation in ActiveCampaign",
+        width: 798,
+        height: 743,
+        // The drawn AutomationCanvas directly above this already spans the full
+        // container; showing a second full-width flow diagram underneath it made
+        // the page read as one long picture. Click to see it at full size.
+        thumbnail: true,
       },
     ],
     canvas: [
@@ -214,10 +273,10 @@ export const caseStudies: CaseStudy[] = [
   {
     slug: "so-tool-onboarding-flow",
     discipline: "Product / Onboarding UX",
-    title: "A problem-agitation-solution onboarding flow in WeWeb",
+    title: "Onboarding flow in WeWeb",
     cardOutcome: "A five-step flow that personalizes the payoff before the signup form.",
     leadOutcome:
-      "A five-step, problem-agitation-solution flow that gives users a personalized glimpse of their result before they ever see a signup form.",
+      "A five-step, onboarding flow that gives users a personalized glimpse of their result before they ever see a signup form.",
     tags: ["WeWeb", "UI/UX", "Conditional Logic"],
     quickFacts: {
       role: "UI and flow logic, built from a client-provided design spec",
@@ -227,27 +286,63 @@ export const caseStudies: CaseStudy[] = [
       impact: "No metrics tracked for this flow specifically",
     },
     overview:
-      `This flow precedes the Super Objective (SO) Tool itself, opening with "You're about to discover your Super Objective™." It's structured as a problem-agitation-solution sequence: pain-point selection, a multi-select resonance screen, a "here's what that's costing you" consequence screen, a positive reframe, then the transition into the full SO Tool.`,
+      `This flow precedes the Super Objective (SO) Tool itself, opening with "You're about to discover your Super Objective™." It's structured as a problem-agitation-solution sequence: a multi-select resonance screen, a single-select screen narrowing those picks to one pain point, a "here's what that's costing you" consequence screen, a positive reframe, then the transition into the full SO Tool.`,
     problem:
       "Getting a user to commit to a self-discovery tool cold is a hard ask — the flow needed to build buy-in by giving users an early, personalized sense of the payoff before asking for anything.",
     process: [
-      "Five steps: pain-point selection → multi-select resonance → cost framing → positive reframe → transition into the SO Tool.",
+      "Five steps: multi-select resonance → single-select narrowing → cost framing → positive reframe → transition into the SO Tool.",
       'The reframe step is the hinge of the flow — a selected pain point like "I\'m stuck and don\'t know why" flips to a paired positive outcome, "You see the path forward," with a supporting benefit list.',
     ],
     solution:
-      "Designed the UI and built the flow logic in WeWeb, including conditional logic that personalizes the reframe and outcome copy based on the user's earlier answers.",
+      "Designed the UI and wireframe in Figma and rebuilt the design and flow logic in WeWeb, including conditional logic that personalizes the reframe and outcome copy based on the user's earlier answers.",
     resultsType: "operational",
     metricsNote:
       "No completion or conversion metrics exist for this flow specifically — it's tracked separately from the SO Tool's own 63% completion figure.",
     roleAttribution:
       "Kenneth designed the UI and built the flow logic in WeWeb from a design spec the client provided. He did not originate the underlying content or copy strategy for this flow.",
+    // Flow order, matching the sequence a user actually walks through. The card
+    // thumbnail is pinned to the reframe screen via cardFigureIndex below rather
+    // than reordering these.
     figures: [
-      { src: "/work/so-tool/01-welcome.png", alt: "SO Tool welcome screen reading \"You're about to discover your Super Objective™\"", caption: "Welcome / intro screen" },
-      { src: "/work/so-tool/02-pain-cost.png", alt: "Screen listing the cost of the user's selected pain point", caption: "\"Here's what that's costing you\" — consequence screen" },
-      { src: "/work/so-tool/03-reframe.png", alt: "Reframe screen flipping the pain point to a positive outcome with a supporting benefit list", caption: "Reframe screen" },
-      { src: "/work/so-tool/04-single-select.png", alt: "Single-select pain-point question screen", caption: "Pain-point selection (single-select)" },
-      { src: "/work/so-tool/05-multi-select.png", alt: "Multi-select resonance question screen", caption: "Resonance screen (multi-select)" },
+      {
+        src: "/work/onboarding-sequence/1.png",
+        alt: "SO Tool welcome screen reading \"You're about to discover your Super Objective™\", with supporting copy and a \"Let's Get Started\" button",
+        caption: "Welcome / intro screen",
+        width: 1527,
+        height: 852,
+      },
+      {
+        src: "/work/onboarding-sequence/2.png",
+        alt: "Multi-select screen asking the user to select 3 options that resonate most, showing a grid of pain-point tiles with three highlighted",
+        caption: "Resonance screen (multi-select)",
+        width: 1601,
+        height: 856,
+      },
+      {
+        src: "/work/onboarding-sequence/3.png",
+        alt: "Single-select screen asking which pain point is most challenging right now, listing only the three the user picked on the previous screen with one highlighted and a \"Selected: 1/1\" counter",
+        caption: "Pain-point selection (single-select)",
+        width: 1606,
+        height: 826,
+      },
+      {
+        src: "/work/onboarding-sequence/4.png",
+        alt: "Red-bordered consequence screen headed \"Here's what that is costing you\", listing nine costs tied to the selected pain point above a \"Flip to What's Possible\" button",
+        caption: "\"Here's what that's costing you\" — consequence screen",
+        width: 1617,
+        height: 865,
+      },
+      {
+        src: "/work/onboarding-sequence/5.png",
+        alt: "Reframe screen showing \"I'm stuck and don't know why\" becoming \"You see the path forward\", with a supporting grid of nine benefits",
+        caption: "Reframe screen",
+        width: 1181,
+        height: 707,
+      },
     ],
+    // The reframe screen, not the welcome one — it's the only frame that shows
+    // the conditional payoff in a single image.
+    cardFigureIndex: 4,
     creditLine: "Super Objective™ is a trademark of Brave Leadership.",
   },
   {
@@ -274,7 +369,7 @@ export const caseStudies: CaseStudy[] = [
       "This sequence sits downstream of a separate re-engagement campaign (see the SO Tool re-engagement case study) that feeds it volume — together they form one connected funnel: reactivate → nurture → convert.",
     ],
     solution:
-      "Built and implemented the full automation in ActiveCampaign: entry trigger on SO Tool completion, 11 email sends with wait steps between them, and a purchase goal. Owned segmentation, subject lines, pre-header text, and email design; QA'd the entire sequence before and after launch.",
+      "Built and implemented the full automation in ActiveCampaign: an entry trigger on the SO Tool completion tag, a suppression check that routes anyone who already bought the Super Objective Report out to other automations, then 11 email sends with wait steps between them and a purchase goal. Owned segmentation, subject lines, pre-header text, and email design; QA'd the entire sequence before and after launch.",
     resultsType: "benchmark",
     benchmarkResults: [
       {
@@ -297,30 +392,24 @@ export const caseStudies: CaseStudy[] = [
     ],
     roleAttribution:
       "Body copy for this sequence was written by someone else. Kenneth built and implemented the automation in ActiveCampaign, QA'd and tested it end to end, and owned segmentation, subject lines, pre-header text, email design, and sequencing logic.",
-    canvas: [
-      { id: "trigger", kind: "trigger", label: "TRIGGER", title: "SO Tool completed" },
-      { id: "email-1", kind: "email", label: "EMAIL 1", title: "Welcome / opening" },
-      { id: "wait-1", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-2", kind: "email", label: "EMAIL 2", title: "Nurture" },
-      { id: "wait-2", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-3", kind: "email", label: "EMAIL 3", title: "Nurture" },
-      { id: "wait-3", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-4", kind: "email", label: "EMAIL 4", title: "Nurture" },
-      { id: "wait-4", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-5", kind: "email", label: "EMAIL 5", title: "Nurture" },
-      { id: "wait-5", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-6", kind: "email", label: "EMAIL 6", title: "Nurture" },
-      { id: "wait-6", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-7", kind: "email", label: "EMAIL 7", title: "Nurture" },
-      { id: "wait-7", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-8", kind: "email", label: "EMAIL 8", title: "Nurture" },
-      { id: "wait-8", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-9", kind: "email", label: "EMAIL 9", title: "Nurture" },
-      { id: "wait-9", kind: "wait", label: "WAIT", title: "Between-send interval" },
-      { id: "email-10", kind: "email", label: "EMAIL 10", title: "Nurture" },
-      { id: "wait-10", kind: "wait", label: "WAIT", title: "Final interval" },
-      { id: "email-11", kind: "email", label: "EMAIL 11", title: "Deadline close — midnight cutoff" },
-      { id: "goal", kind: "goal", label: "GOAL", title: "Leadership Essentials purchase" },
+    // No `canvas` here, unlike CS1: this study shows the real ActiveCampaign
+    // capture instead of the drawn approximation of it. The screenshot carries
+    // strictly more than the diagram did — the actual condition wording, the
+    // nested purchase check on the Yes path, and live per-email metrics — and
+    // the drawn version had to keep its 11 email nodes generic anyway, since
+    // the source only exposes real subject lines for emails 1 and 2.
+    visualHeading: "The flow",
+    // The grid card keeps its 50.78% tile rather than promoting this figure to
+    // a thumbnail; see cardVisual on the CaseStudy type.
+    cardVisual: "metric",
+    figures: [
+      {
+        src: "/work/so-le-dripfeed/so_le_campaign_1.png",
+        alt: "ActiveCampaign automation for the SO Tool to LE Pitch sequence: it starts when the tag 'Leaders With Super Objective' is added, waits 20 minutes, then checks whether the contact's purchases already contain the Super Objective Report. The No path runs the nurture sends — Email 1 'Way to Excavate Your Super Objective!' at 67 sent and 76.1% open, then a 2-day wait, then Email 2 'One question that makes all the difference' at 65 sent and 49.2% open. The Yes path checks for a Leadership Essentials purchase and routes both outcomes into other automations, ending this one.",
+        caption: "The nurture sequence in ActiveCampaign — entry trigger, the purchase-suppression branch, and the opening sends",
+        width: 939,
+        height: 782,
+      },
     ],
   },
 ];

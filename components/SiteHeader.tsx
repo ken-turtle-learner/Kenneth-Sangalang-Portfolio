@@ -144,7 +144,7 @@ export default function SiteHeader() {
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
             aria-expanded={mobileOpen}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-text-secondary"
+            className="hover-grow flex h-11 w-11 items-center justify-center rounded-full border border-border text-text-secondary hover:border-accent hover:text-accent-text"
           >
             <span aria-hidden="true">☰</span>
           </button>
@@ -163,7 +163,7 @@ export default function SiteHeader() {
               menuButtonRef.current?.focus();
             }}
             aria-label="Close menu"
-            className="absolute top-4 right-6 flex h-11 w-11 items-center justify-center rounded-full border border-border text-text-secondary"
+            className="hover-grow absolute top-4 right-6 flex h-11 w-11 items-center justify-center rounded-full border border-border text-text-secondary hover:border-accent hover:text-accent-text"
           >
             <span aria-hidden="true">✕</span>
           </button>

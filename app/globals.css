@@ -131,7 +131,8 @@ h4,
 .type-display,
 .type-h2,
 .type-h3,
-.type-h4 {
+.type-h4,
+.type-node-title {
   font-family: var(--font-display), sans-serif;
   color: var(--text);
 }
@@ -208,6 +209,23 @@ h4,
   font-weight: 600;
 }
 
+/* Title line inside an automation-canvas node (components/CanvasNode.tsx, plus
+   the branch header AutomationCanvas draws inline). Deliberately its own class
+   rather than `.type-h3 text-base`, which is what these used to say: the
+   type-scale classes in this file are unlayered and Tailwind's utilities live
+   in @layer utilities, so an unlayered .type-h3 beats .text-base no matter the
+   specificity — the utility never applied and every node title rendered at
+   24px inside a ~130px branch column, spilling out of its card. Same cascade
+   mechanic the .canvas-node--exit rule further down relies on deliberately.
+
+   Line height is tighter than the body scale because these titles routinely
+   wrap to two or three lines in the narrow branch columns. */
+.type-node-title {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
 /* Fourth heading level, introduced for the Problem/Solution/Results/The flow
    subheaders inside a work block. Deliberately small and wide-tracked rather
    than just "a smaller h3" — at this level it's labelling a passage, so it
@@ -254,15 +272,42 @@ h4,
   font-variant-numeric: tabular-nums;
 }
 
-/* The 01-07 markers in the "How I work" section. Quiet by design (--text-muted,
-   not accent): the step titles carry the content, the numerals only encode
-   that this is an ordered sequence. */
-.type-step-number {
+/* Title, body copy, and stat tile for the Featured Work cards
+   (components/WorkCard.tsx). Three sibling classes rather than
+   `type-h3 text-xl` / `type-body text-base` / `type-stat text-4xl`, for the
+   same cascade reason spelled out at .type-node-title above: these .type-*
+   rules are unlayered and Tailwind's size utilities live in @layer utilities,
+   so .type-h3's 1.5rem would win over any utility regardless of class order.
+
+   Stepped down one notch from the page scale because the cards were ~500px
+   tall and dominating the section — at card size these are index entries that
+   get you into the lightbox, not the passage of copy the h3/body scale is
+   built for. */
+.type-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  /* Tighter than the browser default because every card title wraps to two
+     lines at this width. */
+  line-height: 1.3;
+}
+
+.type-card-body {
+  font-family: var(--font-body), serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  /* .type-body's max-width: 68ch is deliberately dropped — the card is
+     already narrower than that measure. */
+}
+
+/* The headlineMetric shown in place of a thumbnail. .type-stat's 3.5rem was
+   sized for a full-width stat block; in the card's shorter image band the
+   longest metric ("7 courses · 50 students") would swallow the tile. */
+.type-card-stat {
   font-family: var(--font-mono), monospace;
-  font-size: 1.75rem;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
-  color: var(--text-muted);
 }
 
 .type-node-label {
@@ -341,6 +386,84 @@ h4,
     border-color 250ms ease;
 }
 
+/* ---- Pointer response ----
+   Every clickable control on the site grows slightly under the cursor. Lives
+   here as a class rather than as Tailwind `hover:scale-*` utilities for two
+   reasons: the transition list has to be shared by ten call sites, and a
+   `transition-*` utility would lose anyway anywhere this class lands on an
+   element that also carries an unlayered rule (see the .type-node-title note
+   above for why unlayered always beats @layer utilities).
+
+   The property list names `scale` and `translate`, NOT `transform`. Tailwind
+   v4's scale and translate utilities set those two standalone CSS properties,
+   so `transition-[transform,...]` — what WorkCard and ContactCard used to
+   carry — transitioned a property neither of them ever changed, and their
+   hover lift snapped rather than eased. */
+.hover-grow {
+  transition:
+    scale 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    translate 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+/* Gated on a real hovering pointer: on touch, :hover sticks after a tap and
+   would leave the last-tapped card sitting grown until something else is
+   tapped. :focus-visible and :active below are unguarded — both are real on
+   touch and on keyboard. */
+@media (hover: hover) {
+  .hover-grow:hover {
+    scale: 1.04;
+  }
+
+  /* Must follow .hover-grow:hover — same specificity, so source order is what
+     lets the modifier win. */
+  .hover-grow--subtle:hover {
+    scale: 1.02;
+  }
+}
+
+.hover-grow:focus-visible {
+  scale: 1.04;
+}
+
+/* The 2xl work/contact cards are ~550px wide, where 1.04 reads as a lurch
+   rather than a nudge. They also keep their own hover:-translate-y-0.5. */
+.hover-grow--subtle:focus-visible {
+  scale: 1.02;
+}
+
+.hover-grow:active {
+  scale: 0.98;
+}
+
+.hover-grow--subtle:active {
+  scale: 1;
+}
+
+/* Written to per-frame by components/RepelField.tsx: 0 when the cursor is out
+   of range of this pill, 1 when it's on top of it. Registered with @property
+   so it has a guaranteed <number> initial value — the colour mixes below then
+   resolve to plain --border/--text-secondary before any JS runs, which is the
+   state a crawler (and a no-JS visitor) sees. */
+@property --near {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: false;
+}
+
+/* The tech-strip pills. Unlayered, so these two colours beat the
+   `border-border text-text-secondary` utilities on components/Tag.tsx.
+   Capped at 70% of the way to accent: a pill is fleeing the cursor the whole
+   time it's near one, so a full-accent state would only ever flash. */
+.repel-item {
+  will-change: transform;
+  border-color: color-mix(in oklab, var(--accent) calc(var(--near) * 70%), var(--border));
+  color: color-mix(in oklab, var(--accent-text) calc(var(--near) * 70%), var(--text-secondary));
+}
+
 /* Lightbox modal fade-in animation, matching the site's reveal motion language
    (cubic-bezier(0.22, 1, 0.36, 1)). Backdrop fades in quickly; panel fades in
    and slides up from below. */
@@ -398,6 +521,17 @@ h4,
   .canvas-connector-line {
     stroke-dashoffset: 0 !important;
   }
+
+  /* The blanket rule above only collapses transition *durations*, so without
+     these the grow would still happen — instantly, which is worse than not at
+     all. Colour and surface changes are kept: those are legibility, not
+     motion. (components/RepelField.tsx makes the same distinction in JS,
+     where no CSS media query can reach it.) */
+  .hover-grow:hover,
+  .hover-grow:focus-visible,
+  .hover-grow:active {
+    scale: 1;
+  }
 }
 
 /* ---- Automation canvas (components/AutomationCanvas.tsx,
@@ -419,6 +553,14 @@ h4,
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1.125rem 1.25rem;
+  /* Nodes in the branch columns are flex children of a narrow column, and a
+     flex item defaults to min-width:auto (its min-content width) — so a long
+     title would push the card wider than its column instead of wrapping.
+     break-word then handles the leftover case: a single word longer than the
+     content box (e.g. "Re-engagement" at ~90px) painted outside the border
+     rather than breaking, which is the overflow this pair fixes. */
+  min-width: 0;
+  overflow-wrap: break-word;
   opacity: 0;
   transform: translateY(8px);
   transition:
@@ -434,14 +576,31 @@ h4,
   background: var(--accent-soft);
 }
 
+/* The inverse of the goal node: a dashed, muted box marking a path that
+   leaves the automation without converting. */
+.canvas-node--exit {
+  border-style: dashed;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+/* CanvasNode renders every node's label with an accent utility class; this
+   unlayered rule overrides it (Tailwind's utilities sit in a cascade layer),
+   so the exit's label doesn't stay teal against a muted card. */
+.canvas-node--exit .type-node-label {
+  color: var(--text-muted);
+}
+
 .automation-canvas--active .canvas-node,
 .funnel-strip--active .canvas-node {
   opacity: 1;
   transform: translateY(0);
 }
 
-.automation-canvas--active .canvas-node:not(.canvas-node--goal),
-.funnel-strip--active .canvas-node:not(.canvas-node--goal) {
+/* Exits are excluded from the pulse alongside goals — flashing accent teal
+   would undercut the muted treatment above. */
+.automation-canvas--active .canvas-node:not(.canvas-node--goal):not(.canvas-node--exit),
+.funnel-strip--active .canvas-node:not(.canvas-node--goal):not(.canvas-node--exit) {
   animation: canvas-node-pulse 900ms ease-out both;
   animation-delay: min(calc(var(--i, 0) * 80ms), 1200ms);
 }
