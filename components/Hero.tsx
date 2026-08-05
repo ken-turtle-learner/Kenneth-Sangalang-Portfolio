@@ -93,7 +93,7 @@ export default function Hero() {
           </a>
         </Reveal>
       </div>
-
+ 
       {/* index={0} rather than pairing with the h1: order-1 puts this first on
           screen at mobile widths, so it should lead the 60ms reveal stagger
           instead of trailing the eyebrow. Explicit width/height match the
