@@ -31,10 +31,10 @@ export default function About() {
       <div className="mt-12 grid gap-10 md:grid-cols-[1fr_2fr] md:gap-16">
         <Reveal index={0}>
           {/* No preload here (and no `priority`, which Next 16 deprecated in
-              favour of `preload`): this portrait used to sit in the hero, but
-              since the hero became text-first the h1 is the LCP element and
-              preloading a below-the-fold image would fetch the wrong thing
-              first. Explicit width/height still prevent layout shift. */}
+              favour of `preload`): this is the second, below-the-fold copy of
+              a photo the hero already preloads, so preloading it again would
+              only queue a duplicate fetch at the wrong priority. Lazy loading
+              is correct; explicit width/height still prevent layout shift. */}
           <Image
             src="/kenneth-sangalang.jpg"
             alt="Portrait of Kenneth Sangalang"

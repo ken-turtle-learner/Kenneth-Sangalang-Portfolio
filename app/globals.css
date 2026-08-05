@@ -181,9 +181,18 @@ h4,
 /* .type-display is sized for short, punchy strings — a two-word name, "Let's
    talk." At 5.5rem a full sentence becomes unreadable, so the hero headline
    (which is now a complete sentence, not the name) steps the ceiling down and
-   opens the leading back up. Pair it with a max-w-[20ch] on the element. */
+   opens the leading back up. Pair it with a max-w-[20ch] on the element.
+
+   3.5rem is the floor for this ceiling, not an arbitrary pick: .type-h2 caps
+   at 3rem, so this leaves an 8px step keeping the hero ranked above section
+   headings. Drop it further and that hierarchy flattens. The 2.25rem lower
+   bound is deliberately left where it is — on mobile the clamp already sits
+   on its floor, so only the ceiling and the vw term affect desktop.
+
+   Only the hero h1 uses this modifier; the shared .type-display base above
+   is what four other headings render at, so retune here, never there. */
 .type-display--sentence {
-  font-size: clamp(2.25rem, 5.5vw, 4rem);
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
   line-height: 1.05;
 }
 

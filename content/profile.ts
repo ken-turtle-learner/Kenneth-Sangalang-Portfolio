@@ -16,9 +16,9 @@ export const profile = {
   // head, so the opening lines read across all three roles instead of
   // positioning Kenneth as an email specialist who also does other things.
   heroSubline:
-    "Digital Marketing Specialist with 5+ years building WordPress and CMS platforms, marketing automation, and email campaigns. Combines hands-on marketing execution with development skills (PHP, JavaScript, React, Node.js, Python, FastAPI) to bridge marketing and devellopment.",
+    "Digital Marketing Specialist with 5+ years building WordPress and CMS platforms, marketing automation, and email campaigns. Combines hands-on marketing execution with tech skills (PHP, HTML, CSS, JavaScript, Python, SQL).",
   summary:
-    "Digital Marketing Specialist with 5+ years building WordPress and CMS platforms, marketing automation, and email campaigns. Combines hands-on marketing execution with development skills (PHP, JavaScript, React, Node.js, Python, FastAPI) to bridge marketing and devellopment.",
+    "Digital Marketing Specialist with 5+ years building WordPress and CMS platforms, marketing automation, and email campaigns. Combines hands-on marketing execution with tech skills (PHP, HTML, CSS, JavaScript, Python, SQL).",
   // The About narrative, in Kenneth's own first-person voice. Split into
   // paragraphs here rather than as one string so About.tsx can space them
   // without parsing on newlines.
