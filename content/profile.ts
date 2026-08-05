@@ -1,14 +1,9 @@
 // Transcribed from content-source/Kenneth_Sangalang_Master_Resume.md and
 // Kenneth_Sangalang_Career_Profile.md, plus the About narrative Kenneth
-// supplied directly from his LinkedIn profile. Drives the hero, about, and
-// contact sections — kept as a single object (rather than split further)
-// since every field here is a one-off, not a repeated/listy structure.
+// supplied directly from his LinkedIn profile.
 export const profile = {
   name: "Kenneth Sangalang",
-  // The three roles this site targets. WordPress is named explicitly rather
-  // than folded into a catch-all "MarTech" label — it's a distinct role
-  // Kenneth applies for, and the portfolio's WordPress/REST work is
-  // substantial enough that hiding it under a generic title undersold it.
+  // The three roles this site targets. 
   titles: ["Digital Marketing Specialist", "Marketing Automation Specialist", "WordPress Specialist"],
   availability: "Available now · Remote",
   email: "kenjsangalang@gmail.com",
@@ -16,17 +11,32 @@ export const profile = {
     linkedin: "https://linkedin.com/in/kenneth-jon-sangalang-tech",
     github: "https://github.com/ken-turtle-learner",
   },
-  tagline: "I build the marketing automation that converts — and the code underneath it.",
+  tagline: "Hi, I'm Kenneth. I build web sites, marketing automation, and everything in between.",
   // Leads on WordPress and keeps email inside the list rather than at its
   // head, so the opening lines read across all three roles instead of
   // positioning Kenneth as an email specialist who also does other things.
   heroSubline:
-    "5+ years building WordPress sites, marketing automation, and the custom REST integrations that connect them — for education and B2B/B2C brands.",
+    "Digital Marketing Specialist with 5+ years building WordPress and CMS platforms, marketing automation, and email campaigns. Combines hands-on marketing execution with development skills (PHP, JavaScript, React, Node.js, Python, FastAPI) to bridge marketing and devellopment.",
   summary:
-    "Digital Marketing Specialist with 5+ years building WordPress and CMS platforms, marketing automation, and email lifecycle campaigns for education and B2B/B2C brands. Track record of automating manual marketing operations through custom REST APIs and full-stack internal tools, and of above-benchmark email engagement — a 50.78% open rate and 3.83% click rate against industry medians of 33.78% and 1.37%. Combines hands-on marketing execution with development skills (PHP, JavaScript, React, Node.js, Python, FastAPI) to bridge marketing and engineering.",
-  // The About narrative, supplied by Kenneth from his LinkedIn profile and
-  // kept in his own voice. Split into paragraphs here rather than as one
-  // string so About.tsx can space them without parsing on newlines.
+    "Digital Marketing Specialist with 5+ years building WordPress and CMS platforms, marketing automation, and email campaigns. Combines hands-on marketing execution with development skills (PHP, JavaScript, React, Node.js, Python, FastAPI) to bridge marketing and devellopment.",
+  // The About narrative, in Kenneth's own first-person voice. Split into
+  // paragraphs here rather than as one string so About.tsx can space them
+  // without parsing on newlines.
+  //
+  // Structure is deliberate: start at the visible marketing layer, show the
+  // specific limits that forced code, name what grew out of that, then land on
+  // the systems underneath as the actual job. Analytics closes the story as a
+  // continuation of the same pattern rather than a departure from marketing —
+  // the previous ending ("Today my focus is data analytics") read to a hiring
+  // manager as an exit signal on a site that targets marketing roles.
+  //
+  // No single project anchors the narrative; the case studies carry specifics.
+  // Claims here stay inside what the source docs support: the enrollment REST
+  // API and the platform integrations are his, so the story stops at "the layer
+  // I've spent years building" rather than claiming a solo platform build,
+  // which the career profile still lists as an unresolved ownership question.
+  //
+  // Em-dash-free per the style preferences in Kenneth_Sangalang_Career_Profile.md.
   aboutStory: [
     "I started with managing WordPress sites and handling digital marketing, and never stopped learning from there.",
     "Role by role, problem by problem, that foundation grew into full-stack development: custom plugins in PHP and JavaScript, React and Node.js applications, API integrations, and database management with Supabase. Every skill I have, I learned because a real problem required it.",
@@ -40,6 +50,6 @@ export const profile = {
     dates: "06/2014 – 10/2020",
   },
   languages: ["English", "German", "Spanish"],
-  interests: ["Freediving", "Gym", "Motorcycle riding"],
+  interests: ["Freediving", "Gym", "Motorcycles", "Electronics", "Learning new languages"],
   currently: "Building depth in data analytics — Python, SQL, and structured analysis.",
 } as const;
