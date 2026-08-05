@@ -1,7 +1,11 @@
+"use client";
+
+import { useRef, useState } from "react";
 import Reveal from "@/components/Reveal";
 import Section from "@/components/Section";
 import SideProject from "@/components/SideProject";
-import WorkBlock from "@/components/WorkBlock";
+import WorkCard from "@/components/WorkCard";
+import WorkLightbox from "@/components/WorkLightbox";
 import { caseStudies } from "@/content/case-studies";
 
 // Provenance for the one study that renders benchmark bars. Lives here rather
@@ -10,21 +14,50 @@ import { caseStudies } from "@/content/case-studies";
 // numbers were pulled from, not the case study itself.
 const BENCHMARK_FOOTNOTE = "Brave Leadership · Aug 2025 – Aug 2026 · ActiveCampaign";
 
-// The home page's featured-work section: case studies with expandable details,
-// followed by a side project. The old version included a funnel-strip visualization;
-// these blocks carry Problem, Solution, and Results on the page itself.
+// The home page's featured-work section: case studies in a 2-column grid with
+// click-to-open lightbox, followed by a side project. Client component to manage
+// the lightbox's open/close state and focus restoration.
 export default function WorkGrid() {
+  const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
+
+  const handleCardOpen = (slug: string) => {
+    // Store a reference to the button that triggered the lightbox so we can
+    // return focus to it when the modal closes.
+    if (typeof window !== "undefined") {
+      const button = document.querySelector(
+        `button[data-work-card-slug="${slug}"]`
+      ) as HTMLButtonElement | null;
+      if (button) lastTriggerRef.current = button;
+    }
+    setActiveSlug(slug);
+  };
+
+  const handleLightboxClose = () => {
+    setActiveSlug(null);
+    // Return focus to the card that opened the lightbox.
+    if (lastTriggerRef.current) {
+      lastTriggerRef.current.focus();
+    }
+  };
+
+  const activeStudy = caseStudies.find((s) => s.slug === activeSlug) ?? null;
+
   return (
     <Section id="work" heading="Featured work">
-      <div className="mt-16 flex flex-col gap-16">
+      {/* 2-column grid on desktop, 1-column on mobile */}
+      <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2">
         {caseStudies.map((study, index) => (
           <Reveal key={study.slug} index={index}>
-            <WorkBlock study={study} benchmarkFootnote={BENCHMARK_FOOTNOTE} />
+            <WorkCard study={study} onOpen={() => handleCardOpen(study.slug)} />
           </Reveal>
         ))}
       </div>
 
       <SideProject />
+
+      {/* Lightbox modal — rendered once at the section level, not per-card */}
+      <WorkLightbox study={activeStudy} onClose={handleLightboxClose} benchmarkFootnote={BENCHMARK_FOOTNOTE} />
     </Section>
   );
 }

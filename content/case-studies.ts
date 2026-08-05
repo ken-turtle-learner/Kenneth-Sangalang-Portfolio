@@ -158,6 +158,13 @@ export const caseStudies: CaseStudy[] = [
     ],
     roleAttribution:
       "Kenneth owned this end to end: wrote the copy, designed the segmentation and trigger logic, QA tested, and launched. This campaign sits just upstream of the 11-email 'SO Tool to LE Pitch' nurture sequence — together they're one connected funnel: reactivate → nurture → convert.",
+    figures: [
+      {
+        src: "/work/so-tool-reengagement/automation-flow.png",
+        alt: "ActiveCampaign automation showing wait-until-tag-exists steps for Needs a nudge, Disengaged, and Inactive, each branching into a Super Objective re-engagement email",
+        caption: "The re-engagement automation in ActiveCampaign",
+      },
+    ],
     canvas: [
       { id: "trigger", kind: "trigger", label: "TRIGGER", title: "Started SO Tool, went inactive" },
       { id: "wait", kind: "wait", label: "WAIT", title: "Inactivity window" },
