@@ -15,7 +15,7 @@ export const braveLeadership: ExperienceEntry = {
     'Built and managed email marketing automation in ActiveCampaign; architected and owned an 11-email nurture-to-conversion sequence ("SO Tool to LE Pitch") that generated 705 sends over 12 months with a 50.78% open rate (+17.0 pts vs. 33.78% industry median) and 3.83% click rate (+2.46 pts vs. 1.37% industry median), 0% bounce rate, and 0% unsubscribe rate.',
     "Wrote copy and built segmentation and trigger logic for re-engagement email campaigns targeting inactive users, raising completion of a self-discovery assessment tool used as a marketing lead magnet from 48% to 63%.",
     "Designed and built high-converting websites and landing pages using WordPress, Bubble.io, and WeWeb to support lead generation and course sales.",
-    "Built and managed a full online course portal (WordPress, LearnDash, WooCommerce) supporting 7 courses and 50 students.",
+    "Built and managed a full online course portal (WordPress, LearnDash, WooCommerce) supporting 7 courses and 150+ students.",
     "Developed secure custom WordPress REST API endpoints to sync purchase data and automate student enrollment, eliminating manual enrollment processing after every purchase.",
     "Integrated marketing and operations platforms via Zapier, webhooks, and API calls to streamline lead nurturing and course enrollment workflows.",
     "Built a full-stack internal web application (FastAPI backend with authentication and rate limiting, deployed on Render) to support the online course platform, including a new coaching-portal addition to the AI/LLM-powered Super Objective quiz tool.",

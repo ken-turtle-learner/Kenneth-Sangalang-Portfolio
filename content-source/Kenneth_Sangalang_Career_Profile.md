@@ -27,7 +27,7 @@ Education · B2B/B2C · AI-enabled leadership training platform
 - Built and managed email marketing automation in ActiveCampaign; flagship 11-email nurture sequence ("SO Tool to LE Pitch") sent 705 emails over 12 months, achieving a **50.78% open rate** (vs. 33.78% industry median, **+17.0 pts**) and **3.83% click rate** (vs. 1.37% industry median, **+2.46 pts**), with **0% bounce rate** and **0% unsubscribe rate**.
 - Wrote copy and designed segmentation/trigger logic for re-engagement campaigns prompting inactive users to complete the "Super Objective (SO) Tool" self-discovery exercise; QA tested and launched end-to-end, contributing to a **63% completion rate** for the tool.
 - Designed and built high-converting websites and landing pages using WordPress, Bubble.io, and WeWeb.
-- Built and structured a full course platform in WordPress and LearnDash, publishing and organizing **7 leadership courses for 50 students**, including content delivery and course structure.
+- Built and structured a full course platform in WordPress and LearnDash, publishing and organizing **7 leadership courses for 150+ students**, including content delivery and course structure.
 - Integrated WooCommerce with the LearnDash course platform to handle course purchases, checkout, and automatic enrollment.
 - Built secure custom WordPress REST API endpoints to sync purchase data and auto-enroll students, eliminating manual enrollment after every course purchase.
 - Migrated a WordPress site to a new domain using SiteGround hosting.

@@ -42,10 +42,11 @@ and it will name the file and line.
 
 | File | Controls |
 | --- | --- |
-| `content/profile.ts` | Name, job titles, email, LinkedIn/GitHub, availability badge, hero headline and subline, About story, education, languages, interests |
+| `content/profile.ts` | Name, job titles, email + subject line, location/timezone, LinkedIn/GitHub, availability badge, hero headline and subline, the three proof-band numbers, About story, education, languages, interests |
 | `content/case-studies.ts` | All four case studies — cards, lightboxes, and `/work/[slug]` pages |
 | `content/experience.ts` | Brave Leadership role, freelance clients, the side project card |
-| `content/skills.ts` | Grouped skills list (in About) and the platform strip (under the hero) |
+| `content/skills.ts` | Grouped skills list (in About) and the platform strip (currently unused — see `TechStrip` below) |
+| `content/testimonial.ts` | The single pull-quote between Work and Experience. Hidden until `published: true` |
 | `content/nav.ts` | Header and footer navigation links |
 
 ### Page files
@@ -65,10 +66,12 @@ and it will name the file and line.
 | --- | --- |
 | `SiteHeader` / `SiteFooter` | Sticky nav bar and footer |
 | `Hero` | Top-of-page intro and portrait |
-| `TechStrip` | The platform pills under the hero |
+| `ProofBand` | The three headline numbers directly under the hero |
+| `TechStrip` | The platform pills. **Not on the page** — kept for reuse; see below |
 | `WorkGrid` | The Featured Work section (cards + lightbox) |
 | `WorkCard` | One card in that grid |
 | `WorkLightbox` | The modal a card opens |
+| `Testimonial` | The pull-quote between Work and Experience |
 | `ExperienceTimeline` | The work history timeline |
 | `About` / `SkillsMatrix` | About section and its skills breakdown |
 | `ContactCTA` / `ContactCard` | Closing contact section |
@@ -87,6 +90,19 @@ and it will name the file and line.
 
 `content/profile.ts` → `email`. This updates the header button, the hero, the
 contact cards, and the footer at once — it is only stored in one place.
+
+`emailSubject` next to it is the subject line prefilled on every mailto link, so
+a recruiter clicking "Email me" gets a compose window that isn't blank rather than
+one they have to compose from scratch.
+
+### Say where you are and when you work
+
+`content/profile.ts` → `location` and `timezone`. Both feed the sentence under
+"Let's talk." and both are optional — leave one empty and it's dropped from the
+sentence rather than rendered blank.
+
+Worth filling in. Recruiters screen on location and working hours before they
+reply, so answering up front saves a round trip.
 
 ### Change the hero headline
 
@@ -110,8 +126,32 @@ contact section, both with a pulsing dot.
 paragraph**. Don't put line breaks inside a string; add another array entry
 instead.
 
-The section heading and intro line above it aren't in this file — they're in
-`components/About.tsx`, as the `heading` and `intro` props on `<Section>`.
+The section heading and eyebrow above it aren't in this file — they're in
+`components/About.tsx`, as the `heading` and `label` props on `<Section>`.
+
+### Change the three numbers under the hero
+
+`content/profile.ts` → `proofPoints`. Each entry has a `stat` (the big number), a
+`label`, a `footnote`, and the `slug` of the case study it links to.
+
+The numbers themselves are **not typed in here.** They're read out of
+`content/case-studies.ts` — the same values the results tables use — so a figure
+can only be corrected in one place. To change what a tile says, fix the case
+study; the tile follows.
+
+Keep each `stat` short. All three sit side by side, and one that wraps while the
+others don't looks broken.
+
+### Add a testimonial
+
+`content/testimonial.ts`. Fill in `quote`, `name`, `role`, and `company`, add a
+`sourceUrl` if the quote came from a LinkedIn recommendation, then set
+`published: true`. Until you do, the whole section is skipped, so the placeholder
+text can never ship as though it were real.
+
+Ask for a sentence about **what you did and what changed as a result.** "He
+rebuilt our enrollment flow and cut a manual step out of every purchase" carries
+far more weight than "great to work with."
 
 ### Edit your work history
 
@@ -124,17 +164,30 @@ The section heading and intro line above it aren't in this file — they're in
 Numbers in bullets are highlighted in teal automatically — write "50.78%" as
 plain text and `lib/highlight-numbers.tsx` styles it. No markup needed.
 
-### Edit skills or the platform strip
+### Edit skills
 
-`content/skills.ts` holds two separate lists, on purpose:
+`content/skills.ts` holds two separate lists:
 
 - `skillGroups` — the full grouped breakdown inside About. Group order is
-  display order; add a group by copying an existing object.
-- `platforms` — the pill strip under the hero. **Named tools only**
-  ("WordPress", "Python"), not capability phrases ("Funnel & KPI Analysis").
+  display order; add a group by copying an existing object. **This is the one
+  that renders.**
+- `platforms` — the pill strip `TechStrip` draws. `TechStrip` is no longer on the
+  home page (see below), so editing this list currently changes nothing.
 
-Adding a skill to one does not add it to the other. That's deliberate — the
-strip is a scannable summary, not a mirror of the full list.
+Adding a skill to one does not add it to the other.
+
+### Where the platform strip went
+
+`TechStrip` used to sit directly under the hero. It was removed from
+`app/page.tsx` because its pills are a subset of the groups `SkillsMatrix`
+already renders in About, so the page said the same thing twice — and the
+duplicate was occupying the most valuable slot below the fold, pushing every
+number further down.
+
+The component and its cursor-repelling `RepelField` are untouched in
+`components/`. To bring it back, import it in `app/page.tsx` and place it between
+`<ExperienceTimeline />` and `<About />` — not above `<ProofBand />`, or the
+proof goes back below the fold.
 
 ### Rename or reorder nav links
 
@@ -169,6 +222,16 @@ A single entry in `content/case-studies.ts` renders in three places:
    `process`, `learnings`, `quickFacts`, and `roleAttribution`
 
 You write it once. All three update together.
+
+Each card is a real link to `/work/<slug>`, not a button, even though a normal
+click opens the lightbox instead of navigating. That's deliberate: it means a
+card can be middle-clicked or Cmd-clicked into a new tab, right-clicked to copy
+the link, and followed by search engines. A recruiter can send a hiring manager
+one case study rather than the whole home page.
+
+The mechanism is `next/link`'s `onNavigate`, which Next.js fires **only** for
+same-tab client-side navigation. Modifier-clicks skip it and navigate normally.
+If you ever swap it for `onClick`, that stops being true and Cmd-click breaks.
 
 ### Adding a new case study
 
@@ -460,9 +523,9 @@ final state instead of animating.
    import Section from "@/components/Section";
    import Reveal from "@/components/Reveal";
 
-   export default function Testimonials() {
+   export default function Speaking() {
      return (
-       <Section id="testimonials" label="Praise" heading="What people say"
+       <Section id="speaking" label="Talks" heading="Speaking"
                 intro="One line saying what this section holds.">
          <Reveal index={0}>{/* … */}</Reveal>
        </Section>
@@ -504,6 +567,8 @@ A push triggers one.
 - [ ] New images have `alt` text describing what's shown, and real `width`/`height`
 - [ ] Numeric twins match their display strings in any results rows
 - [ ] Every claim is one you can back up; `roleAttribution` says what you didn't do
+- [ ] Links leaving the site open in a new tab (see §9)
+- [ ] `content/testimonial.ts` is either unpublished or holds a real, approved quote
 
 ---
 
@@ -537,6 +602,24 @@ a subtly wrong-looking image.
 
 **Prev/next links wrap around.** The last case study links forward to the first.
 Reordering the array reorders those links too.
+
+**Links that leave the site need `external`.** Anything pointing at LinkedIn,
+GitHub, or a client site must set `external` on `<Button>`, or
+`target="_blank" rel="noopener noreferrer"` on a bare `<a>`. Without it the link
+replaces the portfolio in the same tab and the visit ends there. `mailto:` links
+are the exception — they should not open a new tab.
+
+**Proof-band numbers are derived, not typed.** `proofPoints` in
+`content/profile.ts` reads its figures out of `content/case-studies.ts`. Editing
+the tile text won't change a number; edit the case study instead. Tile three also
+splits `headlineMetric` on its `·` separator, so keep that format.
+
+**A dark card background will wash out the text inside it.** `.type-label` and
+`.type-small` set their own colours as unlayered CSS, so a `bg-accent` fill leaves
+them at unreadable contrast and no Tailwind `text-*` class will override them.
+That's why the primary contact card uses the tinted `bg-accent-soft` instead.
+
+**`components/TechStrip.tsx` is no longer rendered.** See [§3](#where-the-platform-strip-went).
 
 **`components/FunnelStrip.tsx` and `funnelStripSteps` are currently unused.**
 They're the horizontal counterpart to `AutomationCanvas`, kept for a funnel that

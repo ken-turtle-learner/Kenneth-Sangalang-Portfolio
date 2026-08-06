@@ -16,7 +16,12 @@ export default function SideProject() {
             <Tag key={tag}>{tag}</Tag>
           ))}
         </div>
-        <a href={sideProject.githubUrl} className="type-label mt-4 inline-block hover:text-accent-text">
+        <a
+          href={sideProject.githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="type-label mt-4 inline-block hover:text-accent-text"
+        >
           View on GitHub →
         </a>
       </div>

@@ -12,15 +12,14 @@ const FACTS = [
 ];
 
 // Portrait, narrative, fact sheet, skills breakdown. Copy comes from
-// content/profile.ts; the heading and intro are set below.
+// content/profile.ts; the heading and eyebrow are set below.
+//
+// The eyebrow is "Who I am" rather than "Background" because ExperienceTimeline
+// already uses that one, and two sections wearing the same eyebrow stops it
+// working as a landmark.
 export default function About() {
   return (
-    <Section
-      id="about"
-      label=""
-      heading="About Me"
-      intro=""
-    >
+    <Section id="about" label="Who I am" heading="About Me">
       <div className="mt-12 grid gap-10 md:grid-cols-[1fr_2fr] md:gap-16">
         <Reveal index={0}>
           {/* No `preload` here: this is the second, below-the-fold copy of a

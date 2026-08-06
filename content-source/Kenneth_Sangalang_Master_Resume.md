@@ -32,7 +32,7 @@ Digital Marketing Specialist with 5+ years building and scaling marketing automa
 
 * Designed and built high-converting websites and landing pages using WordPress, Bubble.io, and WeWeb to support lead generation and course sales.
 
-* Built and structured a full online course platform in WordPress and LearnDash, publishing and organizing 7 courses for 50 students, including content delivery and course structure.
+* Built and structured a full online course platform in WordPress and LearnDash, publishing and organizing 7 courses for 150+ students, including content delivery and course structure.
 
 * Integrated WooCommerce with the course platform to handle purchases, checkout, and automatic student enrollment.
 

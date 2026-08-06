@@ -58,16 +58,29 @@ export default function Hero() {
 
         <Reveal index={4} className="mt-6 flex flex-wrap items-center justify-center gap-4 md:justify-start">
           <Button href="#work">See the work →</Button>
-          <Button href={`mailto:${profile.email}`} variant="ghost">
+          <Button
+            href={`mailto:${profile.email}?subject=${encodeURIComponent(profile.emailSubject)}`}
+            variant="ghost"
+          >
             {profile.email}
           </Button>
         </Reveal>
 
         <Reveal index={5} className="mt-6 flex justify-center gap-4 md:justify-start">
-          <a href={profile.socials.linkedin} className="type-label hover:text-accent-text">
+          <a
+            href={profile.socials.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="type-label hover:text-accent-text"
+          >
             LinkedIn
           </a>
-          <a href={profile.socials.github} className="type-label hover:text-accent-text">
+          <a
+            href={profile.socials.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="type-label hover:text-accent-text"
+          >
             GitHub
           </a>
         </Reveal>

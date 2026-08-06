@@ -9,11 +9,46 @@ function handleFromUrl(url: string) {
   return url.replace(/^https?:\/\/(www\.)?/, "");
 }
 
+// Prefilled subject: see profile.emailSubject.
+const mailto = `mailto:${profile.email}?subject=${encodeURIComponent(profile.emailSubject)}`;
+
+// Ordered by how much the page wants each one clicked. Email is the ask; with no
+// resume PDF on the site, LinkedIn is the thing a recruiter forwards to a hiring
+// manager, so it has to outrank GitHub.
 const METHODS = [
-  { platform: "Email", handle: profile.email, href: `mailto:${profile.email}` },
-  { platform: "LinkedIn", handle: handleFromUrl(profile.socials.linkedin), href: profile.socials.linkedin },
-  { platform: "GitHub", handle: handleFromUrl(profile.socials.github), href: profile.socials.github },
+  { platform: "Email", handle: profile.email, href: mailto, cta: "Email me →", variant: "primary" as const },
+  {
+    platform: "LinkedIn",
+    handle: handleFromUrl(profile.socials.linkedin),
+    href: profile.socials.linkedin,
+    cta: "View profile →",
+    external: true,
+  },
+  {
+    platform: "GitHub",
+    handle: handleFromUrl(profile.socials.github),
+    href: profile.socials.github,
+    cta: "See the code →",
+    external: true,
+  },
 ];
+
+// Builds the lead line out of whichever logistics are filled in. Recruiters
+// screen on location and hours before replying, so stating them up front removes
+// a round trip — but an unset field is skipped rather than shown empty.
+function leadLine() {
+  const sentences = [
+    "Open to remote roles in digital marketing, marketing automation, and web development.",
+  ];
+
+  const logistics = [profile.location && `Based in ${profile.location}`, profile.timezone && `working ${profile.timezone}`]
+    .filter(Boolean)
+    .join(", ");
+  if (logistics) sentences.push(`${logistics}.`);
+
+  sentences.push("I reply within a day.");
+  return sentences.join(" ");
+}
 
 // The closing CTA. Also rendered at the foot of every /work/[slug] page, so a
 // change here shows up in five places.
@@ -26,9 +61,7 @@ export default function ContactCTA() {
         </h2>
       </Reveal>
       <Reveal index={1}>
-        <p className="type-lead mx-auto mt-4 max-w-xl">
-          Open to remote Digital Marketing, Marketing Automation, and WordPress roles — reach out directly.
-        </p>
+        <p className="type-lead mx-auto mt-4 max-w-xl">{leadLine()}</p>
       </Reveal>
       <Reveal index={2} className="mx-auto mt-10 grid max-w-3xl gap-4 sm:grid-cols-3">
         {METHODS.map((method) => (

@@ -27,8 +27,11 @@ const plexMono = IBM_Plex_Mono({
 });
 
 const TITLE = "Kenneth Sangalang — Digital Marketing, Marketing Automation & WordPress Specialist";
+// This is the snippet a recruiter sees in search results and link previews, so
+// it leads with numbers rather than a role description. Past tense throughout:
+// the integrations were built and shipped, but are no longer in service.
 const DESCRIPTION =
-  "WordPress sites, marketing automation, and the custom REST integrations that connect them — built by someone who also ships the code underneath.";
+  "Marketing automation and lifecycle email, plus the WordPress builds and custom code underneath. 50.78% open rates, a 15-point lift in lead-magnet completion, and a course platform built end to end.";
 
 export const metadata: Metadata = {
   title: {

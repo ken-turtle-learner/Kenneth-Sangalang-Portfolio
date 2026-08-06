@@ -16,15 +16,17 @@ const BENCHMARK_FOOTNOTE = "Brave Leadership · Aug 2025 – Aug 2026 · ActiveC
 // that open a lightbox, followed by the side project.
 export default function WorkGrid() {
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
-  const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
+  // An anchor, not a button: WorkCard renders each card as a next/link so the
+  // case study has a real, shareable URL. Keep this selector in step with it.
+  const lastTriggerRef = useRef<HTMLAnchorElement | null>(null);
 
   const handleCardOpen = (slug: string) => {
     // Remember the triggering card so focus can return to it on close.
     if (typeof window !== "undefined") {
-      const button = document.querySelector(
-        `button[data-work-card-slug="${slug}"]`
-      ) as HTMLButtonElement | null;
-      if (button) lastTriggerRef.current = button;
+      const card = document.querySelector(
+        `a[data-work-card-slug="${slug}"]`
+      ) as HTMLAnchorElement | null;
+      if (card) lastTriggerRef.current = card;
     }
     setActiveSlug(slug);
   };

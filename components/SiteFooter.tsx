@@ -14,7 +14,10 @@ export default function SiteFooter() {
             <p className="type-small mt-3 max-w-xs">
               Digital marketing, marketing automation, and WordPress — plus the code underneath.
             </p>
-            <a href={`mailto:${profile.email}`} className="type-label mt-4 inline-block hover:text-accent-text">
+            <a
+              href={`mailto:${profile.email}?subject=${encodeURIComponent(profile.emailSubject)}`}
+              className="type-label mt-4 inline-block hover:text-accent-text"
+            >
               {profile.email}
             </a>
           </div>
@@ -36,12 +39,22 @@ export default function SiteFooter() {
             <p className="type-label text-text-muted">Elsewhere</p>
             <ul className="mt-3 space-y-2">
               <li>
-                <a href={profile.socials.linkedin} className="type-small hover:text-accent-text">
+                <a
+                  href={profile.socials.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="type-small hover:text-accent-text"
+                >
                   LinkedIn
                 </a>
               </li>
               <li>
-                <a href={profile.socials.github} className="type-small hover:text-accent-text">
+                <a
+                  href={profile.socials.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="type-small hover:text-accent-text"
+                >
                   GitHub
                 </a>
               </li>

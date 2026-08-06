@@ -118,7 +118,10 @@ export default function SiteHeader() {
 
         <div className="hidden items-center gap-4 md:flex">
           <ThemeToggle />
-          <Button href={`mailto:${profile.email}`} variant="ghost">
+          <Button
+            href={`mailto:${profile.email}?subject=${encodeURIComponent(profile.emailSubject)}`}
+            variant="ghost"
+          >
             Email me
           </Button>
         </div>

@@ -3,6 +3,10 @@ type ButtonProps = {
   // When provided, renders as an <a>; otherwise a <button>.
   href?: string;
   variant?: "primary" | "ghost";
+  // Opens the link in a new tab. Set it on anything leaving the site: without
+  // it, clicking through to LinkedIn or GitHub replaces the portfolio in the
+  // same tab and the visit is over.
+  external?: boolean;
   className?: string;
 };
 
@@ -19,11 +23,22 @@ const VARIANTS = {
   ghost: "border border-accent text-accent-text hover:bg-accent-soft",
 };
 
-export default function Button({ children, href, variant = "primary", className = "" }: ButtonProps) {
+export default function Button({
+  children,
+  href,
+  variant = "primary",
+  external = false,
+  className = "",
+}: ButtonProps) {
   const classes = `${BASE} ${VARIANTS[variant]} ${className}`;
 
   return href ? (
-    <a href={href} className={classes}>
+    <a
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+      className={classes}
+    >
       {children}
     </a>
   ) : (

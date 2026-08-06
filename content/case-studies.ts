@@ -187,17 +187,17 @@ export const caseStudies: CaseStudy[] = [
     cardOutcome: "Custom REST endpoints and a FastAPI tool that replaced manual course enrollment.",
     leadOutcome:
       "Secure custom WordPress REST endpoints that auto-enroll students on purchase, a FastAPI internal tool, and a coaching-portal build for Brave Leadership's AI-powered Super Objective quiz.",
-    headlineMetric: "7 courses · 50 students",
+    headlineMetric: "7 courses · 150+ students",
     tags: ["WordPress REST", "FastAPI", "Zapier", "Webhooks"],
     quickFacts: {
       role: "Backend endpoints & automation end-to-end; contributed to the coaching-portal build",
       company: "Brave Leadership",
       timeline: "11/2020 – 06/2026",
       team: "Kenneth (endpoints); Kenneth + product team (coaching portal)",
-      impact: "7 courses · 50 students · manual enrollment eliminated",
+      impact: "7 courses · 150+ students · manual enrollment eliminated",
     },
     overview:
-      "Brave Leadership's course portal (WordPress + LearnDash + WooCommerce) supports 7 courses and 50 students. Every purchase used to require manual enrollment.",
+      "Brave Leadership's course portal (WordPress + LearnDash + WooCommerce) supports 7 courses and 150+ students. Every purchase used to require manual enrollment.",
     problem:
       "Purchase data lived in WooCommerce but enrollment in LearnDash was a manual step after every sale — a growing operational bottleneck as course volume increased.",
     solution:
