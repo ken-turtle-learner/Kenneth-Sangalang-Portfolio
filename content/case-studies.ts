@@ -3,7 +3,7 @@
 // from "goal" because goal nodes carry permanent teal highlight styling.
 export type AutomationNode = {
   id: string;
-  kind: "trigger" | "email" | "wait" | "goal" | "exit";
+  kind: "trigger" | "email" | "wait" | "goal" | "action" | "exit";
   label: string;
   title: string;
   metric?: string;
@@ -22,7 +22,7 @@ export type CanvasStep = AutomationNode | AutomationBranch;
 
 // "Result vs. industry median" row.
 // resultValue/comparisonValue are numeric twins of the display strings and size
-// the bars in components/BenchmarkPanel.tsx — keep each pair in sync.
+// the bars in components/BenchmarkPanel.tsx, so keep each pair in sync.
 export type BenchmarkRow = {
   label: string;
   result: string;
@@ -32,7 +32,7 @@ export type BenchmarkRow = {
 };
 
 // "Before → After" row, for studies with a real pre-launch baseline.
-// beforeValue/afterValue are the numeric twins — keep them in sync too.
+// beforeValue/afterValue are the numeric twins, so keep them in sync too.
 export type BeforeAfterRow = {
   label: string;
   before: string;
@@ -77,7 +77,7 @@ export type CaseStudy = {
   quickFacts: QuickFacts;
   overview: string;
   problem: string;
-  // Optional sections. Omit them rather than padding — /work/[slug] skips the
+  // Optional sections. Omit them rather than padding: /work/[slug] skips the
   // heading entirely when they're undefined.
   process?: string[];
   solution: string;
@@ -103,12 +103,16 @@ export type CaseStudy = {
   // to the headlineMetric tile. Set "metric" when the figure is unreadable at
   // thumbnail size.
   cardVisual?: "figure" | "metric";
+  // Card cover for a study whose proof is an endpoint rather than a number.
+  // Takes precedence over headlineMetric on the card, but headlineMetric stays
+  // in place: content/profile.ts still reads it for the ProofBand.
+  cardRoute?: { method: string; path: string };
   // Which figure the card shows, when it shouldn't be the first. Defaults to 0.
   cardFigureIndex?: number;
   creditLine?: string;
 };
 
-// Array order is display order — on the home page, and for the prev/next links
+// Array order is display order, both on the home page and for the prev/next links
 // on /work/[slug].
 export const caseStudies: CaseStudy[] = [
   {
@@ -117,7 +121,7 @@ export const caseStudies: CaseStudy[] = [
     title: "Getting leads from 48% to 63% completion on a self-discovery tool",
     cardOutcome: "A re-engagement campaign that lifted lead-magnet completion by 15 points.",
     leadOutcome:
-      "A re-engagement campaign for Brave Leadership's self-discovery lead magnet, raising completion from 48% to 63% — strategy, copy, and build all mine.",
+      "A re-engagement campaign for Brave Leadership's self-discovery lead magnet, raising completion from 48% to 63%. Strategy, copy, and build all mine.",
     headlineMetric: "+15 pts",
     tags: ["ActiveCampaign", "Segmentation", "Trigger Logic", "Webhooks"],
     quickFacts: {
@@ -128,7 +132,7 @@ export const caseStudies: CaseStudy[] = [
       impact: "48% → 63% completion (+15 pts)",
     },
     overview:
-      "The Super Objective (SO) Tool is Brave Leadership's self-discovery lead magnet — the entry point into their funnel. A meaningful share of leads started it but never finished, which meant they never reached the nurture sequence downstream (see the SO Tool to LE Pitch case study) at all.",
+      "The Super Objective (SO) Tool is Brave Leadership's self-discovery lead magnet, the entry point into their funnel. A meaningful share of leads started it but never finished, which meant they never reached the nurture sequence downstream (see the SO Tool to LE Pitch case study) at all.",
     problem:
       "Leads were starting the SO Tool and going inactive before completing it, capping the volume available to every stage of the funnel after it.",
     solution:
@@ -145,11 +149,11 @@ export const caseStudies: CaseStudy[] = [
       },
     ],
     roleAttribution:
-      "Kenneth owned this end to end: wrote the copy, designed the segmentation and trigger logic, QA tested, and launched. This campaign sits just upstream of the 11-email 'SO Tool to LE Pitch' nurture sequence — together they're one connected funnel: reactivate → nurture → convert.",
+      "Kenneth owned this end to end: wrote the copy, designed the segmentation and trigger logic, QA tested, and launched. This campaign sits just upstream of the 11-email 'SO Tool to LE Pitch' nurture sequence. Together they're one connected funnel: reactivate → nurture → convert.",
     heroFigure: {
       src: "/work/so-tool-reengagement/reengagement-mockup.png",
-      alt: "The re-engagement automation on a phone screen: wait for 5 minutes, then wait until the Needs a nudge tag exists, then send the Super Objective re-engagement email titled 'Did you get stuck?' — reporting 58 sent, 39.7% open rate, 10.3% click rate — then wait until the Disengaged tag exists before a second send",
-      caption: "The live automation on mobile — 39.7% open rate, 10.3% click rate on the nudge email",
+      alt: "The re-engagement automation on a phone screen: wait for 5 minutes, then wait until the Needs a nudge tag exists, then send the Super Objective re-engagement email titled 'Did you get stuck?' (reporting 58 sent, 39.7% open rate, 10.3% click rate), then wait until the Disengaged tag exists before a second send",
+      caption: "The live automation on mobile: 39.7% open rate, 10.3% click rate on the nudge email",
       width: 1080,
       height: 1920,
     },
@@ -182,34 +186,68 @@ export const caseStudies: CaseStudy[] = [
   },
   {
     slug: "course-platform-api",
-    discipline: "Backend / Systems",
-    title: "Killing manual enrollment with custom WordPress REST endpoints",
-    cardOutcome: "Custom REST endpoints and a FastAPI tool that replaced manual course enrollment.",
+    discipline: "WordPress Development · REST APIs",
+    title: "A WordPress REST endpoint that creates the account and enrolls the buyer",
+    cardOutcome: "One POST with an email address, and the manual step after every sale is gone.",
     leadOutcome:
-      "Secure custom WordPress REST endpoints that auto-enroll students on purchase, a FastAPI internal tool, and a coaching-portal build for Brave Leadership's AI-powered Super Objective quiz.",
+      "One POST with an email address replaces the manual step after every sale: the route creates the WordPress account if it does not exist, then grants the LearnDash course.",
     headlineMetric: "7 courses · 150+ students",
-    tags: ["WordPress REST", "FastAPI", "Zapier", "Webhooks"],
+    // headlineMetric is kept for the ProofBand in content/profile.ts; the card
+    // shows the route instead. The real namespace is deliberately not published:
+    // the live endpoint authenticates on a shared token, so naming it would hand
+    // out half of what someone needs to probe it.
+    cardRoute: { method: "POST", path: "/enroll" },
+    tags: ["WordPress REST", "PHP", "LearnDash", "WooCommerce"],
     quickFacts: {
-      role: "Backend endpoints & automation end-to-end; contributed to the coaching-portal build",
+      role: "Endpoint design and build, integration into the enrollment flow",
       company: "Brave Leadership",
       timeline: "11/2020 – 06/2026",
-      team: "Kenneth (endpoints); Kenneth + product team (coaching portal)",
+      team: "Solo, with Codex assisting on the PHP",
       impact: "7 courses · 150+ students · manual enrollment eliminated",
     },
     overview:
-      "Brave Leadership's course portal (WordPress + LearnDash + WooCommerce) supports 7 courses and 150+ students. Every purchase used to require manual enrollment.",
+      "Brave Leadership sells its leadership courses through a WordPress portal running LearnDash for course delivery and WooCommerce for checkout, carrying 7 courses and 150+ students. Both systems did their own job well, but nothing connected them: a completed purchase did not put the buyer into the course.",
     problem:
-      "Purchase data lived in WooCommerce but enrollment in LearnDash was a manual step after every sale — a growing operational bottleneck as course volume increased.",
+      "Every sale ended in a manual step, and usually two. A purchase gives you an email address, not a user. Most buyers had no WordPress account at all, so enrolling someone meant creating the account, granting course access, and sending them their login by hand, while they waited on something they had already paid for.",
+    process: [
+      "The endpoint had to own both jobs. Creating the account was not an edge case to handle later, it was most of the work, and whatever called the route should not need to know whether the buyer was new or returning.",
+      "So the payload is the smallest thing that identifies a buyer, an email address, and the route handles everything downstream of it. Each course has its own route, so adding a course meant adding a route rather than changing a shared one.",
+    ],
     solution:
-      "Built secure custom WordPress REST API endpoints to sync purchase data and auto-enroll students, plus Zapier/webhook integrations across platforms to streamline the wider enrollment workflow. Also built a full-stack internal tool (FastAPI backend with authentication and rate limiting, deployed on Render) to support the course platform. Separately, contributed to Brave Leadership's Super Objective coaching portal — an AI/LLM-powered, multi-step quiz that generates a personalized impact statement, originally built on Bubble.io and migrated to a full-stack web app — helping build the new coaching-portal addition and some of its API endpoints, with Claude Code assisting on syntax.",
+      "Registered POST routes under a custom REST namespace that authenticate the caller against a bearer token, sanitize the submitted email, and reject the request outright if either check fails. The handler looks the user up by email; if no account exists it creates one with a generated password and fires the WordPress new-user notification so the buyer receives their credentials. Either path then calls LearnDash's ld_update_course_access() to grant the course, and the route returns the user and course IDs as JSON so the calling automation can confirm what happened. Zapier and webhooks connect the purchase event to the route.",
     resultsType: "operational",
     metricsNote:
-      "The outcome here is operational, not a conversion metric: manual enrollment processing was eliminated after every purchase.",
+      "The outcome here is operational rather than a conversion metric. Manual enrollment was eliminated: a purchase now creates the account, grants the course, and emails the buyer their login without anyone touching it.",
     learnings: [
-      "Contributing to the coaching-portal build and its API endpoints is where a lot of the system-design intuition for this kind of work came from.",
+      "Returning the user and course IDs rather than a bare success made the upstream automation debuggable. When an enrollment did not land, the response already said whether the account had been created or matched.",
+      "Shipping it taught me where the seams are. Secrets belong in configuration rather than in the file, and authentication belongs in the route's permission callback rather than in the handler. That is the refactor this work earned.",
     ],
     roleAttribution:
-      "Kenneth built the WordPress REST endpoints and enrollment automation described above end to end. On the separate Super Objective coaching-portal product, he helped build the new coaching-portal addition and some of the API endpoints — with Claude Code assisting on syntax — but did not architect the original quiz product or its AI pipeline.",
+      "Kenneth built these endpoints and wired them into the enrollment flow, using Codex to help write the PHP. He also built and structured the course platform they run on in WordPress, LearnDash, and WooCommerce.",
+    canvas: [
+      { id: "request", kind: "trigger", label: "POST", title: "Purchase posts the buyer's email" },
+      { id: "auth", kind: "action", label: "AUTH", title: "Bearer token checked" },
+      { id: "validate", kind: "action", label: "VALIDATE", title: "Email sanitized and required" },
+      {
+        id: "lookup",
+        kind: "branch",
+        label: "BRANCH",
+        title: "Does the account exist?",
+        outcomes: [
+          {
+            label: "No",
+            nodes: [
+              { id: "create", kind: "action", label: "CREATE", title: "Account made, credentials emailed" },
+              { id: "enroll-new", kind: "goal", label: "GOAL", title: "Enrolled in the course" },
+            ],
+          },
+          {
+            label: "Yes",
+            nodes: [{ id: "enroll-existing", kind: "goal", label: "GOAL", title: "Enrolled in the course" }],
+          },
+        ],
+      },
+    ],
   },
   {
     slug: "so-tool-onboarding-flow",
@@ -229,16 +267,16 @@ export const caseStudies: CaseStudy[] = [
     overview:
       `This flow precedes the Super Objective (SO) Tool itself, opening with "You're about to discover your Super Objective™." It's structured as a problem-agitation-solution sequence: a multi-select resonance screen, a single-select screen narrowing those picks to one pain point, a "here's what that's costing you" consequence screen, a positive reframe, then the transition into the full SO Tool.`,
     problem:
-      "Getting a user to commit to a self-discovery tool cold is a hard ask — the flow needed to build buy-in by giving users an early, personalized sense of the payoff before asking for anything.",
+      "Getting a user to commit to a self-discovery tool cold is a hard ask, so the flow needed to build buy-in by giving users an early, personalized sense of the payoff before asking for anything.",
     process: [
       "Five steps: multi-select resonance → single-select narrowing → cost framing → positive reframe → transition into the SO Tool.",
-      'The reframe step is the hinge of the flow — a selected pain point like "I\'m stuck and don\'t know why" flips to a paired positive outcome, "You see the path forward," with a supporting benefit list.',
+      'The reframe step is the hinge of the flow: a selected pain point like "I\'m stuck and don\'t know why" flips to a paired positive outcome, "You see the path forward," with a supporting benefit list.',
     ],
     solution:
       "Designed the UI and wireframe in Figma and rebuilt the design and flow logic in WeWeb, including conditional logic that personalizes the reframe and outcome copy based on the user's earlier answers.",
     resultsType: "operational",
     metricsNote:
-      "No completion or conversion metrics exist for this flow specifically — it's tracked separately from the SO Tool's own 63% completion figure.",
+      "No completion or conversion metrics exist for this flow specifically. It's tracked separately from the SO Tool's own 63% completion figure.",
     roleAttribution:
       "Kenneth designed the UI and built the flow logic in WeWeb from a design spec the client provided. He did not originate the underlying content or copy strategy for this flow.",
     // Flow order, matching the sequence a user walks through. The card thumbnail
@@ -268,7 +306,7 @@ export const caseStudies: CaseStudy[] = [
       {
         src: "/work/onboarding-sequence/4.png",
         alt: "Red-bordered consequence screen headed \"Here's what that is costing you\", listing nine costs tied to the selected pain point above a \"Flip to What's Possible\" button",
-        caption: "\"Here's what that's costing you\" — consequence screen",
+        caption: "\"Here's what that's costing you\": consequence screen",
         width: 1617,
         height: 865,
       },
@@ -280,7 +318,7 @@ export const caseStudies: CaseStudy[] = [
         height: 707,
       },
     ],
-    // The reframe screen — the only frame showing the conditional payoff.
+    // The reframe screen, the only frame showing the conditional payoff.
     cardFigureIndex: 4,
     creditLine: "Super Objective™ is a trademark of Brave Leadership.",
   },
@@ -293,7 +331,7 @@ export const caseStudies: CaseStudy[] = [
     headlineMetric: "50.78% open",
     tags: ["ActiveCampaign", "Segmentation", "Email Design", "Sequencing Logic"],
     quickFacts: {
-      role: "Automation build, QA, segmentation, subject lines & design — body copy by another writer",
+      role: "Automation build, QA, segmentation, subject lines & design; body copy by another writer",
       company: "Brave Leadership",
       timeline: "Aug 2025 – Aug 2026 (12 months)",
       team: "Kenneth + 1 copywriter",
@@ -302,10 +340,10 @@ export const caseStudies: CaseStudy[] = [
     overview:
       "\"SO Tool to LE Pitch\" is an 11-email sequence that nurtures leads who completed the Super Objective (SO) self-discovery tool toward Leadership Essentials (LE), Brave Leadership's paid program. The sender voice reads as a trusted mentor, not a marketer.",
     problem:
-      "Converting a self-discovery-tool lead into a paying customer without the sequence reading as a hard sell — trust has to be built before the pitch, not assumed.",
+      "Converting a self-discovery-tool lead into a paying customer without the sequence reading as a hard sell. Trust has to be built before the pitch, not assumed.",
     process: [
-      "The throughline across all 11 emails is authentic leadership, self-investment, and shared mission — urgency is introduced only in the final email, a deadline close ('special something ends tonight') with a midnight cutoff.",
-      "This sequence sits downstream of a separate re-engagement campaign (see the SO Tool re-engagement case study) that feeds it volume — together they form one connected funnel: reactivate → nurture → convert.",
+      "The throughline across all 11 emails is authentic leadership, self-investment, and shared mission. Urgency is introduced only in the final email, a deadline close ('special something ends tonight') with a midnight cutoff.",
+      "This sequence sits downstream of a separate re-engagement campaign (see the SO Tool re-engagement case study) that feeds it volume. Together they form one connected funnel: reactivate → nurture → convert.",
     ],
     solution:
       "Built and implemented the full automation in ActiveCampaign: an entry trigger on the SO Tool completion tag, a suppression check that routes anyone who already bought the Super Objective Report out to other automations, then 11 email sends with wait steps between them and a purchase goal. Owned segmentation, subject lines, pre-header text, and email design; QA'd the entire sequence before and after launch.",
@@ -325,7 +363,7 @@ export const caseStudies: CaseStudy[] = [
         resultValue: 3.83,
         comparisonValue: 1.37,
       },
-      { label: "Click-to-open rate", result: "7.54%", comparison: "—", resultValue: 7.54 },
+      { label: "Click-to-open rate", result: "7.54%", comparison: "n/a", resultValue: 7.54 },
       { label: "Bounce rate", result: "0%", comparison: "705 sends, 12 months", resultValue: 0 },
       { label: "Unsubscribe rate", result: "0%", comparison: "705 sends, 12 months", resultValue: 0 },
     ],
@@ -338,8 +376,8 @@ export const caseStudies: CaseStudy[] = [
     figures: [
       {
         src: "/work/so-le-dripfeed/so_le_campaign_1.png",
-        alt: "ActiveCampaign automation for the SO Tool to LE Pitch sequence: it starts when the tag 'Leaders With Super Objective' is added, waits 20 minutes, then checks whether the contact's purchases already contain the Super Objective Report. The No path runs the nurture sends — Email 1 'Way to Excavate Your Super Objective!' at 67 sent and 76.1% open, then a 2-day wait, then Email 2 'One question that makes all the difference' at 65 sent and 49.2% open. The Yes path checks for a Leadership Essentials purchase and routes both outcomes into other automations, ending this one.",
-        caption: "The nurture sequence in ActiveCampaign — entry trigger, the purchase-suppression branch, and the opening sends",
+        alt: "ActiveCampaign automation for the SO Tool to LE Pitch sequence: it starts when the tag 'Leaders With Super Objective' is added, waits 20 minutes, then checks whether the contact's purchases already contain the Super Objective Report. The No path runs the nurture sends: Email 1 'Way to Excavate Your Super Objective!' at 67 sent and 76.1% open, then a 2-day wait, then Email 2 'One question that makes all the difference' at 65 sent and 49.2% open. The Yes path checks for a Leadership Essentials purchase and routes both outcomes into other automations, ending this one.",
+        caption: "The nurture sequence in ActiveCampaign: entry trigger, the purchase-suppression branch, and the opening sends",
         width: 939,
         height: 782,
       },

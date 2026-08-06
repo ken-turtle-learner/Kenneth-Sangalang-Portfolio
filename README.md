@@ -43,7 +43,8 @@ app/
 content/               ← all site copy lives here
   profile.ts           Name, titles, email, socials, hero copy, About story
   case-studies.ts      The case studies, and the types describing them
-  experience.ts        Work history and the side project
+  samples.ts           The Work Samples gallery, grouped by asset type
+  side-project.ts      The side project card under Featured Work
   skills.ts            Skill groups + the platform strip
   nav.ts               Header and footer nav links
 
@@ -51,6 +52,7 @@ components/            Presentational components (see the guide for a map)
 lib/                   Theme persistence, scroll observer, number highlighting
 public/                Static assets — images live here
   work/<slug>/         Case study screenshots, one folder per case study
+  samples/<group>/     Work sample screenshots, one folder per gallery group
 content-source/        Source resume and career profile the copy was drawn from
 ```
 

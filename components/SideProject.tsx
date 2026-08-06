@@ -1,9 +1,9 @@
 import Label from "@/components/Label";
 import Reveal from "@/components/Reveal";
 import Tag from "@/components/Tag";
-import { sideProject } from "@/content/experience";
+import { sideProject } from "@/content/side-project";
 
-// Compact card at the end of the work section, read from content/experience.ts.
+// Compact card at the end of the work section, read from content/side-project.ts.
 export default function SideProject() {
   return (
     <Reveal index={0}>

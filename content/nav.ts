@@ -9,7 +9,7 @@ export type NavLink = {
 // Shared by SiteHeader and SiteFooter so the two can't drift apart.
 export const navLinks: NavLink[] = [
   { id: "work", label: "Work" },
-  { id: "experience", label: "Experience" },
+  { id: "samples", label: "Samples" },
   { id: "about", label: "About" },
   { id: "contact", label: "Contact" },
 ];

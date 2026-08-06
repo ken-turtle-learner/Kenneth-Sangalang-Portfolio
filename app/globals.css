@@ -245,6 +245,15 @@ h4,
   font-variant-numeric: tabular-nums;
 }
 
+/* The card cover for a study whose proof is an endpoint rather than a number.
+   Deliberately smaller than .type-card-stat: a route is far longer than a stat,
+   and at stat size it wraps mid-path. */
+.type-card-route {
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(1.125rem, 2.2vw, 1.75rem);
+  font-weight: 500;
+}
+
 .type-node-label {
   font-family: var(--font-mono), monospace;
   font-size: 0.6875rem;

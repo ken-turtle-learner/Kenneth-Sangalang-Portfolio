@@ -9,11 +9,12 @@ For setup and project structure, see [the README](../README.md).
 2. [Where everything lives](#2-where-everything-lives)
 3. [Quick edits](#3-quick-edits)
 4. [Case studies](#4-case-studies)
-5. [Images](#5-images)
-6. [Colours, type, and spacing](#6-colours-type-and-spacing)
-7. [Adding a new home page section](#7-adding-a-new-home-page-section)
-8. [Publishing](#8-publishing)
-9. [Gotchas](#9-gotchas)
+5. [Work samples](#5-work-samples)
+6. [Images](#6-images)
+7. [Colours, type, and spacing](#7-colours-type-and-spacing)
+8. [Adding a new home page section](#8-adding-a-new-home-page-section)
+9. [Publishing](#9-publishing)
+10. [Gotchas](#10-gotchas)
 
 ---
 
@@ -44,9 +45,10 @@ and it will name the file and line.
 | --- | --- |
 | `content/profile.ts` | Name, job titles, email + subject line, location/timezone, LinkedIn/GitHub, availability badge, hero headline and subline, the three proof-band numbers, About story, education, languages, interests |
 | `content/case-studies.ts` | All four case studies — cards, lightboxes, and `/work/[slug]` pages |
-| `content/experience.ts` | Brave Leadership role, freelance clients, the side project card |
+| `content/samples.ts` | The Work Samples gallery — websites, landing pages, social creatives, email campaigns |
+| `content/side-project.ts` | The side project card at the foot of Featured Work |
 | `content/skills.ts` | Grouped skills list (in About) and the platform strip (currently unused — see `TechStrip` below) |
-| `content/testimonial.ts` | The single pull-quote between Work and Experience. Hidden until `published: true` |
+| `content/testimonial.ts` | The single pull-quote between Work and Work samples. Hidden until `published: true` |
 | `content/nav.ts` | Header and footer navigation links |
 
 ### Page files
@@ -71,8 +73,10 @@ and it will name the file and line.
 | `WorkGrid` | The Featured Work section (cards + lightbox) |
 | `WorkCard` | One card in that grid |
 | `WorkLightbox` | The modal a card opens |
-| `Testimonial` | The pull-quote between Work and Experience |
-| `ExperienceTimeline` | The work history timeline |
+| `Testimonial` | The pull-quote between Work and Work samples |
+| `WorkSamples` | The Work Samples gallery section |
+| `SampleTile` | One tile in that gallery |
+| `SampleLightbox` | The modal a tile opens |
 | `About` / `SkillsMatrix` | About section and its skills breakdown |
 | `ContactCTA` / `ContactCard` | Closing contact section |
 | `AutomationCanvas` | The drawn automation flow diagram |
@@ -153,16 +157,10 @@ Ask for a sentence about **what you did and what changed as a result.** "He
 rebuilt our enrollment flow and cut a manual step out of every purchase" carries
 far more weight than "great to work with."
 
-### Edit your work history
+### Edit the side project card
 
-`content/experience.ts`:
-
-- `braveLeadership.bullets` — the main role's bullet points
-- `freelance.clients` — the freelance client list; copy an existing entry to add one
-- `sideProject` — the side project card at the bottom of Featured Work
-
-Numbers in bullets are highlighted in teal automatically — write "50.78%" as
-plain text and `lib/highlight-numbers.tsx` styles it. No markup needed.
+`content/side-project.ts` → `name`, `description`, `tags`, `githubUrl`. It's the
+card at the foot of Featured Work.
 
 ### Edit skills
 
@@ -186,8 +184,27 @@ number further down.
 
 The component and its cursor-repelling `RepelField` are untouched in
 `components/`. To bring it back, import it in `app/page.tsx` and place it between
-`<ExperienceTimeline />` and `<About />` — not above `<ProofBand />`, or the
-proof goes back below the fold.
+`<WorkSamples />` and `<About />` — not above `<ProofBand />`, or the proof goes
+back below the fold.
+
+### Where the experience timeline went
+
+`ExperienceTimeline` used to render a chronological work history between the
+case studies and About. It was deleted when this site narrowed to a portfolio:
+it duplicated what a resume already does, and it pushed the visual proof further
+down the page. The Work Samples gallery took its slot.
+
+The component and `content/experience.ts` are both gone from the working tree,
+but they're still in git history if you ever want them back:
+
+```bash
+git log --oneline -- components/ExperienceTimeline.tsx
+git show <commit>^:components/ExperienceTimeline.tsx
+```
+
+The one thing that survived the removal is the side project card, which now
+lives in `content/side-project.ts`. The resume prose itself was never deleted —
+it's still in `content-source/Kenneth_Sangalang_Master_Resume.md`.
 
 ### Rename or reorder nav links
 
@@ -239,7 +256,7 @@ If you ever swap it for `onClick`, that stops being true and Cmd-click breaks.
 the screenshots in. Use a slug that matches the one you'll use below.
 
 **Step 2 — get the real pixel dimensions.** These matter (see
-[Images](#5-images)). In PowerShell, from the project root:
+[Images](#6-images)). In PowerShell, from the project root:
 
 ```powershell
 Add-Type -AssemblyName System.Drawing
@@ -306,11 +323,12 @@ that will build:
 | `process` | Array of paragraphs. The Process section is skipped entirely if omitted. |
 | `learnings` | Same, for the Learnings section. |
 | `metricsNote` | Required in practice when `resultsType` is `"operational"` — it's what renders instead of a table. |
-| `figures` | Screenshots. See [Images](#5-images). |
+| `figures` | Screenshots. See [Images](#6-images). |
 | `heroFigure` | A single image beside the page headline. Kept out of `figures` deliberately. |
 | `canvas` | A drawn automation diagram. See below. |
 | `visualHeading` | Heading above the figures in the lightbox, e.g. `"The flow"`. |
 | `cardVisual` | `"metric"` forces the card to show the stat tile instead of a screenshot. |
+| `cardRoute` | `{ method, path }`, e.g. `{ method: "POST", path: "/foo/bar" }`. Covers the card with an endpoint signature instead of the stat tile, for work whose proof is an interface rather than a number. Beats `headlineMetric` on the card and leaves it intact for the ProofBand. |
 | `cardFigureIndex` | Which figure the card shows. Defaults to `0`. |
 | `creditLine` | Trademark or attribution line under the figures. |
 
@@ -374,7 +392,7 @@ Node kinds:
 
 | `kind` | Renders as |
 | --- | --- |
-| `trigger`, `email` | A normal card |
+| `trigger`, `email`, `action` | A normal card. Use `action` for a non-email step, e.g. an API call |
 | `wait` | Not a card — its `title` becomes a label on the connector line |
 | `goal` | A card with permanent teal highlight |
 | `exit` | A dashed, muted card — a path that leaves without converting |
@@ -393,12 +411,82 @@ live metrics that a drawing can't.
 
 ---
 
-## 5. Images
+## 5. Work samples
+
+The gallery under the case studies. Case studies go deep on four projects; this
+covers everything else that shipped — sites, landing pages, social creatives,
+email campaigns. One screenshot, one sentence, and a live link where there is
+one. No write-up required, which is the point: it's the row you can add to in
+five minutes.
+
+### Adding one
+
+1. **Drop the image** in `public/samples/<group>/`, where `<group>` is the `id`
+   of the group it belongs to: `sites`, `landing`, `social`, or `email`. Create
+   the folder if it doesn't exist.
+2. **Read its real pixel dimensions** — the PowerShell snippet in
+   [§4](#adding-a-new-case-study) works here too.
+3. **Add the entry** to that group's `items` array in `content/samples.ts`. Each
+   group already has a commented-out template showing the shape.
+
+```ts
+{
+  id: "course-portal",              // unique across the whole file
+  title: "Online course portal",
+  client: "Brave Leadership",
+  blurb: "Course catalogue, enrolment, and student dashboard for 7 courses and 150+ students.",
+  stack: ["WordPress", "LearnDash", "WooCommerce"],
+  liveUrl: "https://example.com",   // optional
+  image: {
+    src: "/samples/sites/course-portal.png",
+    alt: "Course catalogue page listing seven courses with enrolment buttons",
+    width: 1600,                    // ← the file's real pixel width
+    height: 1000,                   // ← and height
+  },
+},
+```
+
+Numbers in `blurb` are highlighted in teal automatically — write "150+ students"
+as plain text and `lib/highlight-numbers.tsx` styles it. No markup needed.
+
+### Rules worth knowing
+
+**An empty group renders nothing.** Not a heading over blank space — the whole
+row disappears. So you can leave `social` empty until you've picked the assets,
+and nothing on the live site looks unfinished. If *every* group is empty the
+section removes itself entirely, which also kills the "Samples" nav link, since
+the anchor it scrolls to would no longer exist.
+
+**Omit `liveUrl` rather than linking a dead page.** A recruiter who clicks
+through to a 404 has learned something worse than nothing. When it's present,
+the tile shows a `Live ↗` link and draws the domain in the browser chrome bar.
+
+**Groups control the shape, not individual items.** Each group has a `shape` of
+`wide` (16:10, three across), `square` (1:1, four across), or `tall` (4:5, four
+across), and images are cropped from the *top* to fit. So a full-page screenshot
+shows its hero, not its middle. If an asset doesn't suit its group's ratio, it
+probably belongs in a different group.
+
+**`browserFrame: true`** draws the fake browser bar above the screenshot. On for
+`sites` and `landing`, off for creatives and emails — it's there to say "this
+was a real page at a real URL."
+
+### Adding a whole new group
+
+Add an object to `sampleGroups` in `content/samples.ts` with an `id`, `heading`,
+`shape`, and `items`. Nothing else needs touching — `components/WorkSamples.tsx`
+maps the array, and the shape-to-layout mapping is already defined for all three
+shapes.
+
+---
+
+## 6. Images
 
 ### Where they go
 
 ```
 public/work/<case-study-slug>/screenshot.png
+public/samples/<group>/screenshot.png
 public/kenneth-sangalang.jpg        ← the headshot, used in Hero and About
 ```
 
@@ -445,7 +533,7 @@ original and let the build handle it.
 
 ---
 
-## 6. Colours, type, and spacing
+## 7. Colours, type, and spacing
 
 ### Colours
 
@@ -514,7 +602,7 @@ final state instead of animating.
 
 ---
 
-## 7. Adding a new home page section
+## 8. Adding a new home page section
 
 1. **Create the component** in `components/`, wrapping the content in
    `<Section>`:
@@ -545,7 +633,7 @@ structure, and screen-reader landmark for free.
 
 ---
 
-## 8. Publishing
+## 9. Publishing
 
 ```bash
 npm run lint     # catches unused variables, bad hooks
@@ -567,12 +655,12 @@ A push triggers one.
 - [ ] New images have `alt` text describing what's shown, and real `width`/`height`
 - [ ] Numeric twins match their display strings in any results rows
 - [ ] Every claim is one you can back up; `roleAttribution` says what you didn't do
-- [ ] Links leaving the site open in a new tab (see §9)
+- [ ] Links leaving the site open in a new tab (see §10)
 - [ ] `content/testimonial.ts` is either unpublished or holds a real, approved quote
 
 ---
 
-## 9. Gotchas
+## 10. Gotchas
 
 Things that fail quietly. Each is commented at the relevant line in the code.
 
@@ -585,7 +673,7 @@ The string is the label, the number sizes the bar. Change one without the other
 and they disagree.
 
 **`type-*` classes override Tailwind utilities.** See
-[§6](#typography). `className="type-body max-w-sm"` will not narrow anything.
+[§7](#typography). `className="type-body max-w-sm"` will not narrow anything.
 
 **Adding a case study needs a rebuild to appear.** Slugs are pre-rendered at
 build time and unknown slugs 404 rather than rendering on demand. This is

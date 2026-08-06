@@ -1,8 +1,8 @@
 import Reveal from "@/components/Reveal";
 import { testimonial } from "@/content/testimonial";
 
-// A single attributed pull-quote, sitting between the work and the experience
-// timeline — right after the proof, where a person vouching for the numbers does
+// A single attributed pull-quote, sitting between the case studies and the work
+// samples — right after the proof, where a person vouching for the numbers does
 // the most work.
 //
 // Renders nothing until content/testimonial.ts sets `published: true`, so the

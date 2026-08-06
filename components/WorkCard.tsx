@@ -49,6 +49,13 @@ export default function WorkCard({ study, onOpen }: WorkCardProps) {
             quality={75}
             className="object-cover"
           />
+        ) : study.cardRoute ? (
+          // Method and path on separate lines: at one line the path wraps
+          // mid-segment on a half-width card, which reads as a broken URL.
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-accent-soft px-6">
+            <span className="type-label text-accent-text">{study.cardRoute.method}</span>
+            <span className="type-card-route text-accent-text">{study.cardRoute.path}</span>
+          </div>
         ) : study.headlineMetric ? (
           <div className="flex h-full w-full items-center justify-center bg-accent-soft px-6">
             <span className="type-card-stat text-accent-text">{study.headlineMetric}</span>

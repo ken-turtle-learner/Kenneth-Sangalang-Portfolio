@@ -12,7 +12,7 @@
 
 *Apply these whenever building a resume, cover letter, or other content from this file.*
 
-- Never use em-dashes in generated content. Use commas, periods, or colons instead.
+- Never use em-dashes (—) in generated content. Use commas, periods, or colons instead.
 - Don't explicitly label the freelance work (Veteran Woman LLC, Sammat Education) as "concurrent" with the Brave Leadership role, and don't say it happened "alongside a full-time role," even though the dates overlap (see note below). This framing can read poorly to employers; showing the overlapping dates alone is fine.
 - The custom WordPress REST API endpoints and the separate internal FastAPI-based tool (see Work Experience and Projects below) are two different projects. For the FastAPI tool, only some of its API endpoints were developed, with AI/LLM assistance on syntax and implementation. Never describe the FastAPI tool as fully built solo, and never merge or imply the two projects are connected.
 
@@ -27,7 +27,7 @@ Education · B2B/B2C · AI-enabled leadership training platform
 - Built and managed email marketing automation in ActiveCampaign; flagship 11-email nurture sequence ("SO Tool to LE Pitch") sent 705 emails over 12 months, achieving a **50.78% open rate** (vs. 33.78% industry median, **+17.0 pts**) and **3.83% click rate** (vs. 1.37% industry median, **+2.46 pts**), with **0% bounce rate** and **0% unsubscribe rate**.
 - Wrote copy and designed segmentation/trigger logic for re-engagement campaigns prompting inactive users to complete the "Super Objective (SO) Tool" self-discovery exercise; QA tested and launched end-to-end, contributing to a **63% completion rate** for the tool.
 - Designed and built high-converting websites and landing pages using WordPress, Bubble.io, and WeWeb.
-- Built and structured a full course platform in WordPress and LearnDash, publishing and organizing **7 leadership courses for 150+ students**, including content delivery and course structure.
+- Built and structured a full course platform in WordPress and LearnDash, publishing and organizing **7 leadership courses for 150 students**, including content delivery and course structure.
 - Integrated WooCommerce with the LearnDash course platform to handle course purchases, checkout, and automatic enrollment.
 - Built secure custom WordPress REST API endpoints to sync purchase data and auto-enroll students, eliminating manual enrollment after every course purchase.
 - Migrated a WordPress site to a new domain using SiteGround hosting.
@@ -35,6 +35,16 @@ Education · B2B/B2C · AI-enabled leadership training platform
 - Developed some of the API endpoints, with AI/LLM assistance on syntax and implementation, for a separate full-stack internal tool (FastAPI backend hosted on Render, with authentication and rate limiting) built to support the online course platform. This is a distinct project from the WordPress REST API work above; did not build the full tool solo.
 - Analyzed course and student data in Excel to monitor completion, retention, and funnel KPIs.
 - Ran regular campaign performance analysis to improve targeting accuracy and budget efficiency.
+
+### Freelance Work, Various Short-Term Projects
+**Dates: not yet specified**
+
+- Scheduled gym classes
+- Processed customer refunds
+- Generated reports
+- Cleaned and organized Excel data
+- Provided chat support and customer service
+- Managed email correspondence
 
 ### Freelance Marketing & Web Consultant, Self-Employed
 **Apr 2023 – May 2026** *(dates overlap with the Brave Leadership role above; per Tailoring Preferences, don't call this out explicitly as "concurrent" on external resumes)*
@@ -63,20 +73,23 @@ University of Mindanao | Jun 2014 – Oct 2020
 **Languages:** PHP, HTML, CSS, JavaScript, Python
 **Backend / APIs:** REST API design (custom WordPress endpoints), FastAPI (partial endpoint development, AI/LLM-assisted), authentication, rate limiting, deployment on Render
 **Databases:** SQL (joins, aggregations, relational data modeling; self-taught via coursework, not yet applied in a live/production project)
+**Analytics:** GA4 (Google-certified, Google Analytics Individual Qualification; self-taught, not yet applied in a live/production project), Power BI (foundational, self-taught, not yet applied), Google Tag Manager (no experience)
 **Data:** Excel (KPI/funnel tracking), Python: pandas, NumPy, seaborn (self-taught, past year)
 **Other:** Web scraping (BeautifulSoup), Supabase, AI/LLM-assisted development
 
 ---
 
 ## Certifications
-None currently. **Gap to consider closing:** a Google Analytics/Ads, HubSpot, or Zapier certification would reinforce the "martech specialist" positioning and costs little time.
+**Google Analytics Individual Qualification (GA4)** — Google Skillshop. Issued Aug 2026, expires Aug 2027. Current GA4-focused exam (Google fully retired the older Universal Analytics version in 2023; the 12-month validity confirms this is the current GA4 certification, not the legacy one).
+
+**Other gaps to consider closing:** a Google Ads or HubSpot certification would further reinforce the "martech specialist" positioning.
 
 ---
 
 ## Projects / Portfolio
 
 - **Python Web Scraper** (GitHub): Automated BeautifulSoup scraper that extracts, cleans, and deduplicates web data from books.toscrape.com, batch-loaded into a Supabase table for analytics.
-- **Super Objective Tool**: Lead magnet offer at Brave Leadership (FastAPI backend with authentication and rate limiting, hosted on Render). A free tool, AI powered impact statement generator, through a multi-step quiz. Developed some of its API endpoints, and frontend of the coaching portal, with AI/LLM assistance on syntax and implementation; not a full solo build, and a separate project from the WordPress REST API work above.
+- **Course Platform Support Tool**: Internal tool at Brave Leadership (FastAPI backend with authentication and rate limiting, hosted on Render). Developed some of its API endpoints, with AI/LLM assistance on syntax and implementation; not a full solo build, and a separate project from the WordPress REST API work above.
 - **"SO Tool to LE Pitch" Email Automation**: full case study notes below.
 - **Planned:** Additional portfolio case studies to be built after the resume update (using the portfolio-case-study-writer skill). Note: as of the eFlexervices Website Creation Specialist application, no live/hosted portfolio exists yet; this is a real, actionable gap for any role that asks for one.
 
@@ -153,4 +166,5 @@ None currently. **Gap to consider closing:** a Google Analytics/Ads, HubSpot, or
 - No quantified outcomes yet for: LearnDash portal (enrollment growth, revenue impact), Veteran Woman LLC landing pages (conversion rate, client results), Sammat Education social content (follower growth, engagement rate).
 - No certifications yet.
 - Portfolio case studies not yet built; no live/hosted portfolio link exists yet (confirmed gap as of the eFlexervices Website Creation Specialist application).
+- **Open question, unresolved:** dates for the "Freelance Work, Various Short-Term Projects" entry (gym class scheduling, refunds, reporting, Excel cleanup, chat support, email management) haven't been confirmed yet. Fill in before using this entry in any tailored resume or application.
 - **Open question, unresolved:** exact scope of ownership on the course/coaching portal build (WordPress/LearnDash/WooCommerce), specifically whether it was fully built solo or only partially, and how much AI/LLM assistance was used, similar to the FastAPI tool correction above. Confirm before this description is used in any further tailored resume; until confirmed, the portal is still described here as built and maintained without a partial-ownership caveat.

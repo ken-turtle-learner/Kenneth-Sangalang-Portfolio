@@ -2,7 +2,7 @@
 
 **Digital Marketing Specialist  |  Marketing Automation & Email Lifecycle  |  WordPress/LearnDash Web Development**
 
-kenjsangalang@gmail.com   |   linkedin.com/in/kenneth-jon-sangalang-tech   |   github.com/ken-turtle-learner
+kenjsangalang@gmail.com  |  linkedin.com/in/kenneth-jon-sangalang-tech  |  github.com/ken-turtle-learner
 
 **PROFESSIONAL SUMMARY**
 
@@ -16,23 +16,23 @@ Digital Marketing Specialist with 5+ years building and scaling marketing automa
 
 **Technical / Development:** PHP, HTML, CSS, JavaScript, Python, SQL (joins, aggregations, relational data modeling), FastAPI, REST API Development, Authentication & Rate Limiting
 
-**Data & Analytics:** Excel, pandas, NumPy, Seaborn
+**Data & Analytics:** Excel, pandas, NumPy, Seaborn, GA4 (Google-certified, self-taught), Power BI (foundational, self-taught)
 
 **Other:** Supabase, BeautifulSoup, AI/LLM-assisted development
 
 **PROFESSIONAL EXPERIENCE**
 
-**Digital Marketing Specialist · Brave Leadership** *11/2020 – 06/2026*
+**Digital Marketing Specialist · Brave Leadership11/2020 \- 06/2026**
 
-*AI-enabled leadership training platform · Education · B2B/B2C*
+*AI-enabled leadership training platform  ·  Education  ·  B2B/B2C*
 
-* Built and managed email marketing automation in ActiveCampaign; architected and owned an 11-email nurture-to-conversion sequence ("SO Tool to LE Pitch") that generated 705 sends over 12 months with a 50.78% open rate (+17.0 pts vs. 33.78% industry median) and 3.83% click rate (+2.46 pts vs. 1.37% industry median), 0% bounce rate, and 0% unsubscribe rate.
+* Built and managed email marketing automation in ActiveCampaign; architected and owned an 11-email nurture-to-conversion sequence (“SO Tool to LE Pitch”) that generated 705 sends over 12 months with a 50.78% open rate (+17.0 pts vs. 33.78% industry median) and 3.83% click rate (+2.46 pts vs. 1.37% industry median), 0% bounce rate, and 0% unsubscribe rate.
 
 * Wrote copy and built segmentation and trigger logic for re-engagement email campaigns targeting inactive users, contributing to a 63% completion rate for a self-discovery assessment tool used as a marketing lead magnet.
 
 * Designed and built high-converting websites and landing pages using WordPress, Bubble.io, and WeWeb to support lead generation and course sales.
 
-* Built and structured a full online course platform in WordPress and LearnDash, publishing and organizing 7 courses for 150+ students, including content delivery and course structure.
+* Built and structured a full online course platform in WordPress and LearnDash, publishing and organizing 7 courses for 150 students, including content delivery and course structure.
 
 * Integrated WooCommerce with the course platform to handle purchases, checkout, and automatic student enrollment.
 
@@ -42,19 +42,27 @@ Digital Marketing Specialist with 5+ years building and scaling marketing automa
 
 * Integrated marketing and operations platforms via Zapier, webhooks, and API calls to streamline lead nurturing and course enrollment workflows.
 
-* Developed some of the API endpoints, with AI/LLM assistance on syntax and implementation, for a separate full-stack internal tool (FastAPI backend with authentication and rate limiting, deployed on Render) built to support the online course platform.
+* Developed some of the API endpoints, with AI-assisted development, for a separate internal tool (FastAPI backend with authentication and rate limiting, deployed on Render) supporting the course platform.
 
-* Analyzed course and student data in Excel to monitor completion, retention, and funnel KPIs, informing campaign and budget optimization.
+* Analyzed course and student data in Excel to monitor completion, retention, and funnel KPIs.
 
-**Freelance Marketing & Web Consultant · Self-Employed** *04/2023 – 05/2026*
+**Freelance Marketing & Web Consultant · Self-Employed04/2023 \- 05/2026**
 
-***Client: Veteran Woman LLC*** *04/2023 – 01/2026*
+***Client: Veteran Woman LLC**04/2023 \- 01/2026*
 
 * Built landing pages, checkout pages, and workbooks for the client's various campaigns and sub-clients.
 
-***Client: Sammat Education*** *06/2023 – 05/2026*
+***Client: Sammat Education**06/2023 \- 05/2026*
 
 * Managed social media scheduling and content creation.
+
+**Freelance Administrative & Customer Support Work · Self-EmployedDates not yet specified**
+
+* Provided administrative and customer support services for a freelance client, including gym class scheduling, refund processing, report generation, Excel data cleanup, chat support, and email management.
+
+**CERTIFICATIONS**
+
+**Google Analytics Individual Qualification (GA4)**  ·  Google Skillshop  ·  Issued Aug 2026, expires Aug 2027
 
 **PROJECTS**
 
@@ -64,6 +72,6 @@ Digital Marketing Specialist with 5+ years building and scaling marketing automa
 
 **Bachelor of Science in Mechanical Engineering**
 
-University of Mindanao  |  06/2014 – 10/2020
+University of Mindanao  |  06/2014 \- 10/2020
 
 **Languages:** English, German, Spanish

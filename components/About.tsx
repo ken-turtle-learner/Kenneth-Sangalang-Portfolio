@@ -14,9 +14,8 @@ const FACTS = [
 // Portrait, narrative, fact sheet, skills breakdown. Copy comes from
 // content/profile.ts; the heading and eyebrow are set below.
 //
-// The eyebrow is "Who I am" rather than "Background" because ExperienceTimeline
-// already uses that one, and two sections wearing the same eyebrow stops it
-// working as a landmark.
+// Every section wears a distinct eyebrow, or it stops working as a landmark.
+// The ones already taken above this: "Featured work", "Selected work".
 export default function About() {
   return (
     <Section id="about" label="Who I am" heading="About Me">
