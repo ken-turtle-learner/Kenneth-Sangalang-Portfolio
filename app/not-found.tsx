@@ -1,8 +1,6 @@
 import Button from "@/components/Button";
 
-// Custom 404 — styled to match the rest of the site instead of the stock
-// Next.js not-found page. No nav/footer here on purpose: a dead link should
-// offer one clear way back, not a full site chrome to get lost in again.
+// Custom 404. No nav or footer on purpose — one clear way back.
 export default function NotFound() {
   return (
     <section aria-labelledby="not-found-heading" className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">

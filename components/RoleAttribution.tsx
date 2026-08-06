@@ -1,8 +1,5 @@
-// A bordered callout stating plainly what Kenneth did and did not do on a
-// given case study. Every /work/[slug] page renders one — per the plan's
-// non-negotiable on not overclaiming, this is deliberately the most
-// prominent honesty mechanism on the site, not a footnote. Server
-// Component: static text, no interactivity.
+// Bordered callout stating what Kenneth did and did not do on a case study.
+// Every /work/[slug] page renders one.
 export default function RoleAttribution({ text }: { text: string }) {
   return (
     <div className="rounded-2xl border border-border-strong bg-surface p-6">

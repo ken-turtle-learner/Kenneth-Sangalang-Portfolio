@@ -3,28 +3,22 @@ import StatCounter from "@/components/StatCounter";
 
 type BenchmarkTrackProps = {
   label: string;
-  // Numeric result value driving the count-up, e.g. 50.78.
+  // Numeric result driving the count-up, e.g. 50.78.
   value: number;
   suffix?: string;
-  // Bar fill width as a 0-100 percentage. Callers (see components/Proof.tsx)
-  // pre-compute this rather than BenchmarkTrack inferring it from `value`,
-  // since a raw click-rate percentage (e.g. 3.83%) would render as an
-  // almost-invisible sliver — the caller normalizes each row's scale so the
-  // bar stays visually meaningful regardless of the metric's absolute size.
+  // Bar fill width, 0-100. Pre-computed by the caller (BenchmarkPanel) rather
+  // than derived from `value`, so each row can be scaled to stay legible.
   fillPercent: number;
-  // Position (0-100) of the comparison tick mark — the industry median or
-  // pre-launch baseline. Omitted for rows with no comparison figure.
+  // Position (0-100) of the comparison tick — the industry median or baseline.
+  // Omitted for rows with nothing to compare against.
   tickPercent?: number;
-  // e.g. "median 33.78% · ▲ +17.0 pts" or "across 705 sends, 12 months".
+  // e.g. "median 33.78% · ▲ +17.0 pts".
   comparisonText: string;
 };
 
-// The site's signature metric instrument: a horizontal track showing
-// Kenneth's result as a filled bar against a tick mark for the industry
-// median/baseline, instead of a bare stat. This is a Server Component —
-// the actual fill/count-up animation is driven by CSS keyed off the
-// ancestor Reveal's `.reveal--visible` class (see the .benchmark-bar-fill
-// rule in app/globals.css), so no client-side state is needed here.
+// One metric: a filled bar against a tick mark for the median or baseline.
+// The fill animation is CSS, keyed off the ancestor Reveal's .reveal--visible
+// class (see .benchmark-bar-fill in globals.css), so there's no state here.
 export default function BenchmarkTrack({
   label,
   value,

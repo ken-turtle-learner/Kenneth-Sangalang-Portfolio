@@ -8,18 +8,12 @@ import { profile } from "@/content/profile";
 
 const SCROLL_THRESHOLD = 64;
 
-// Sticky site header: transparent over the hero, gains a surface
-// background + blur + bottom border once the page scrolls past
-// SCROLL_THRESHOLD, and underlines whichever nav link matches the section
-// currently in view. Client Component because it needs scroll position and
-// intersection tracking — both browser-only concerns.
+// Sticky header: transparent over the hero, gaining a background and border
+// once the page scrolls past SCROLL_THRESHOLD, and underlining whichever nav
+// link matches the section currently in view.
 export default function SiteHeader() {
-  // Scroll position itself is read-heavy and doesn't need to trigger a
-  // render on every pixel — only the derived "have we crossed 64px?"
-  // boolean does. Keeping raw position in a ref (not state) and only
-  // calling setState on the boolean's actual flip avoids a render per
-  // scroll event, per the project's rerender-use-ref-transient-values and
-  // rerender-derived-state rules.
+  // Raw scroll position lives in a ref so only the derived "crossed 64px?"
+  // boolean triggers a render, not every scroll event.
   const scrolledRef = useRef(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -36,19 +30,14 @@ export default function SiteHeader() {
       }
     }
 
-    // { passive: true } per client-passive-event-listeners — this listener
-    // never calls preventDefault, so the browser can keep scrolling smooth
-    // without waiting on it.
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // One IntersectionObserver, created once, watching every nav-linked
-  // section — not one observer per link. rootMargin narrows the
-  // "in view" band to roughly the vertical center of the viewport, so the
-  // active link updates when a section crosses there rather than as soon
-  // as any sliver of it appears.
+  // Scroll-spy for the active nav underline. rootMargin narrows the "in view"
+  // band to roughly the vertical center of the viewport, so the underline moves
+  // when a section reaches the middle rather than as soon as it peeks in.
   useEffect(() => {
     const sections = navLinks.map((link) => document.getElementById(link.id)).filter(
       (el): el is HTMLElement => el !== null,
@@ -68,9 +57,8 @@ export default function SiteHeader() {
     return () => sectionObserver.disconnect();
   }, []);
 
-  // Minimal focus trap for the mobile overlay: Escape closes it and
-  // restores focus to the button that opened it; Tab cycles within the
-  // overlay's focusable elements instead of escaping to the page behind it.
+  // Focus trap for the mobile overlay: Escape closes and restores focus to the
+  // opening button; Tab cycles inside the overlay instead of the page behind.
   useEffect(() => {
     if (!mobileOpen) return;
 
@@ -112,7 +100,7 @@ export default function SiteHeader() {
           KS
         </a>
 
-        {/* Desktop nav — hidden below md, replaced by the hamburger button */}
+        {/* Desktop nav — below md this is replaced by the hamburger button */}
         <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) => (
             <a

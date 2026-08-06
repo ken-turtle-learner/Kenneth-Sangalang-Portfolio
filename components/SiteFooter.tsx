@@ -2,14 +2,8 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { navLinks } from "@/content/nav";
 import { profile } from "@/content/profile";
 
-// Multi-column close: who this is and how to reach them on the left, the
-// primary nav repeated in the middle so a visitor who scrolled the whole page
-// isn't stranded, and profiles on the right. Copyright and the theme toggle
-// sit on their own bottom row.
-//
-// Column headings are <p className="type-label">, not real headings — they
-// label a list of links, and promoting them to <h2>/<h3> would inject entries
-// into the document outline that compete with the page's actual sections.
+// Site footer. Column headings are <p>, not <h2>/<h3>, so they stay out of the
+// document outline and don't compete with the page's real sections.
 export default function SiteFooter() {
   return (
     <footer className="border-t border-border">

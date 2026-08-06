@@ -3,16 +3,8 @@ export type SkillGroup = {
   skills: string[];
 };
 
-// Group names and most entries come from the resume's SKILLS section. The
-// additions below (React, Node.js, SQL, Custom Plugin Development) come from
-// the LinkedIn narrative Kenneth supplied for the About section, which names
-// stack he'd worked with but the resume didn't list. Still no proficiency
-// ratings anywhere — there's no real data behind a rating and it would read
-// as filler.
-//
-// Web & CMS leads deliberately. The resume ordered Marketing Automation
-// first, which made the whole site read as an email specialist's portfolio;
-// WordPress is one of the three roles being targeted and belongs at the top.
+// The full grouped skills list, rendered by SkillsMatrix inside About.
+// Group order is display order.
 export const skillGroups: SkillGroup[] = [
   {
     name: "Web & CMS",
@@ -65,12 +57,9 @@ export const skillGroups: SkillGroup[] = [
   },
 ];
 
-// The named platforms shown in the home page's "Technologies & integrations"
-// strip. Curated explicitly rather than derived from skillGroups above,
-// because that list mixes named tools ("WordPress") with capability phrases
-// ("Funnel & KPI Analysis") — the strip only wants the former, and any
-// filter clever enough to tell them apart would be more fragile than just
-// naming them. Ordered WordPress-first to match the role emphasis.
+// The home page's "Technologies & integrations" strip. Curated separately from
+// skillGroups above, which mixes named tools ("WordPress") with capability
+// phrases ("Funnel & KPI Analysis") — only named tools belong here.
 export const platforms: string[] = [
   "WordPress",
   "LearnDash",

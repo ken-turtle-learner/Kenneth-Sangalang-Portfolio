@@ -3,12 +3,7 @@ import Reveal from "@/components/Reveal";
 import Tag from "@/components/Tag";
 import { sideProject } from "@/content/experience";
 
-// One compact card — deliberately not inflated into a fifth case study
-// (there's no metric or client story behind it, just a self-directed build).
-//
-// Renders as a plain block rather than its own <Section>: it now sits at the
-// end of the featured-work section, where a full section of its own would
-// have given a side project the same page weight as four client projects.
+// Compact card at the end of the work section, read from content/experience.ts.
 export default function SideProject() {
   return (
     <Reveal index={0}>

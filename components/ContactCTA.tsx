@@ -3,9 +3,8 @@ import Reveal from "@/components/Reveal";
 import Section from "@/components/Section";
 import { profile } from "@/content/profile";
 
-// Strips the protocol so a card can show "github.com/ken-turtle-learner"
-// rather than the full URL. Derived rather than stored alongside the URLs in
-// content/profile.ts, so there's only one place a handle can be wrong.
+// Strips the protocol so a card shows "github.com/name", not the full URL.
+// Derived rather than stored, so a handle can only be wrong in one place.
 function handleFromUrl(url: string) {
   return url.replace(/^https?:\/\/(www\.)?/, "");
 }
@@ -16,13 +15,8 @@ const METHODS = [
   { platform: "GitHub", handle: handleFromUrl(profile.socials.github), href: profile.socials.github },
 ];
 
-// Closing section, and the last CTA on the page before the footer. Also
-// rendered at the foot of every /work/[slug] page, so any change here shows up
-// in five places.
-//
-// The single oversized mailto that used to sit here was one target and one
-// option; the card grid gives each channel equal weight and shows the actual
-// address on each, which is what the reference layout does too.
+// The closing CTA. Also rendered at the foot of every /work/[slug] page, so a
+// change here shows up in five places.
 export default function ContactCTA() {
   return (
     <Section id="contact" headingId="contact-heading" className="text-center">

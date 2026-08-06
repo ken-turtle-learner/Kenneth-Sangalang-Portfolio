@@ -12,9 +12,7 @@ import ResultsTable from "@/components/ResultsTable";
 import RoleAttribution from "@/components/RoleAttribution";
 import { caseStudies } from "@/content/case-studies";
 
-// Every valid slug is known up front and pre-rendered at build time; any
-// other slug 404s rather than attempting on-demand rendering, per the
-// plan's "every route is static" requirement.
+// Every slug is pre-rendered at build time; anything else 404s.
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -26,9 +24,7 @@ export async function generateMetadata(props: PageProps<"/work/[slug]">): Promis
   const study = caseStudies.find((s) => s.slug === slug);
   if (!study) return {};
 
-  // `title` here is just the study title — the root layout's title
-  // template ("%s — Kenneth Sangalang") appends the suffix, so it isn't
-  // repeated here or in openGraph/twitter below.
+  // The root layout's title template appends " — Kenneth Sangalang".
   return {
     title: study.title,
     description: study.leadOutcome,
@@ -45,9 +41,6 @@ export async function generateMetadata(props: PageProps<"/work/[slug]">): Promis
   };
 }
 
-// Section heading — a plain function (not its own component file) since
-// it's only ever used within this page's fixed Overview/Problem/Process/
-// Solution/Results/Learnings structure.
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return <h2 className="type-h3 mt-12">{children}</h2>;
 }
@@ -58,6 +51,7 @@ export default async function CaseStudyPage(props: PageProps<"/work/[slug]">) {
   if (index === -1) notFound();
 
   const study = caseStudies[index];
+  // Prev/next wrap around the array, so every study has both links.
   const prev = caseStudies[(index - 1 + caseStudies.length) % caseStudies.length];
   const next = caseStudies[(index + 1) % caseStudies.length];
 
@@ -68,8 +62,6 @@ export default async function CaseStudyPage(props: PageProps<"/work/[slug]">) {
           ← Back to work
         </Link>
 
-        {/* Header text and the hero mockup share one Reveal so they fade in
-            together and the stagger indices below don't have to shift. */}
         <Reveal index={0}>
           <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-12">
             <div>
@@ -79,11 +71,9 @@ export default async function CaseStudyPage(props: PageProps<"/work/[slug]">) {
             </div>
 
             {/* Rendered inline rather than through Figure.tsx: the mockup is a
-                transparent PNG, so Figure's border would box in empty space.
-                No `order-first` — on mobile the headline should still read
-                before the image. */}
+                transparent PNG, so Figure's border would box in empty space. */}
             {study.heroFigure ? (
-              <figure className="w-[200px] justify-self-center md:w-[240px] md:justify-self-end">
+              <figure className="w-50 justify-self-center md:w-60 md:justify-self-end">
                 <Image
                   src={study.heroFigure.src}
                   alt={study.heroFigure.alt}
@@ -136,8 +126,7 @@ export default async function CaseStudyPage(props: PageProps<"/work/[slug]">) {
           </Reveal>
         </div>
 
-        {/* Canvas and figures render full-width (not clamped to max-w-2xl
-            like the prose above) since both need more horizontal room. */}
+        {/* Canvas and figures render full-width, not clamped to the prose measure. */}
         {study.canvas ? (
           <Reveal index={6} className="mt-8">
             <AutomationCanvas steps={study.canvas} label={`${study.title} automation`} />

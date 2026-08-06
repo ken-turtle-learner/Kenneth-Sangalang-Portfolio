@@ -4,12 +4,9 @@ import { profile } from "@/content/profile";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Static OG image for the home page and as a fallback for any route that
-// doesn't define its own. Deliberately plain (system sans-serif, not the
-// site's actual Montserrat/Newsreader) — next/font's instances aren't
-// available inside next/og's separate rendering context, and fetching font
-// files just for a single static share-card image wasn't worth the added
-// build complexity here.
+// Share card for the home page, and the fallback for routes with no OG image
+// of their own. Uses system sans-serif rather than the site fonts: next/font
+// instances aren't available inside next/og's rendering context.
 export default function OpengraphImage() {
   return new ImageResponse(
     (
@@ -21,9 +18,8 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          // Mirrors the light theme's tokens (--bg, --bg-grad-top and the warm
-          // radial from .bg-gradient-layer in app/globals.css) so the share
-          // card matches the page a visitor actually lands on.
+          // Hardcoded copies of the light theme's --bg and warm radial from
+          // globals.css — keep in sync if those tokens change.
           backgroundColor: "#FDF6F8",
           backgroundImage: "radial-gradient(ellipse 100% 60% at 50% 0%, #FFF0E0 0%, transparent 65%)",
         }}

@@ -8,8 +8,7 @@ const FIELDS: { key: keyof QuickFactsData; label: string }[] = [
   { key: "impact", label: "Impact" },
 ];
 
-// The mono Role/Company/Timeline/Team/Impact strip at the top of every
-// case study page. Server Component — plain data display.
+// The mono facts strip at the top of every case study page.
 export default function QuickFacts({ facts }: { facts: QuickFactsData }) {
   return (
     <dl className="grid gap-4 border-y border-border py-6 sm:grid-cols-5">

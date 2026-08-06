@@ -1,9 +1,5 @@
-// Small pill used for tech stack labels and skills — mono type, outlined,
-// never filled (teal fills are reserved for primary actions/accents).
-//
-// className exists for the one caller that needs per-instance styling:
-// TechStrip tags its pills `repel-item` so components/RepelField.tsx can move
-// them. SkillsMatrix and WorkLightbox pass nothing and are unaffected.
+// Outlined mono pill for tech stack labels and skills. Never filled — teal
+// fills are reserved for primary actions.
 export default function Tag({
   children,
   className = "",

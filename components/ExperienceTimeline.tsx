@@ -3,9 +3,8 @@ import Section from "@/components/Section";
 import { braveLeadership, freelance } from "@/content/experience";
 import { highlightNumbers } from "@/lib/highlight-numbers";
 
-// Quiet vertical timeline — deliberately undecorated (no automation-canvas
-// styling here), per the plan's "spend the boldness in one place" rule.
-// Server Component: purely presentational, no interactivity.
+// Vertical timeline of roles, read from content/experience.ts. Numbers in the
+// bullets are highlighted automatically by lib/highlight-numbers.tsx.
 export default function ExperienceTimeline() {
   return (
     <Section

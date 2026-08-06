@@ -16,9 +16,7 @@ type WorkLightboxProps = {
   benchmarkFootnote?: string;
 };
 
-// Facts card rendered inside the lightbox as a fallback visual when a case study
-// has no canvas or figures (CS2). Ported from WorkBlock.tsx's local WorkFacts
-// component, with the same styling.
+// Fallback visual for a study with no canvas and no figures.
 function LightboxFacts({ facts }: { facts: CaseStudy["quickFacts"] }) {
   const FACTS: { key: keyof CaseStudy["quickFacts"]; label: string }[] = [
     { key: "role", label: "Role" },
@@ -39,15 +37,14 @@ function LightboxFacts({ facts }: { facts: CaseStudy["quickFacts"] }) {
   );
 }
 
-// Full-screen modal overlay for case study details. Handles focus management,
-// scroll lock, keyboard escape, and backdrop click. Content mirrors WorkBlock's
-// expanded body, restructured for a single-column modal layout.
+// The modal a Featured Work card opens: a summary of the case study, with a
+// link through to its full /work/[slug] page. Handles escape, scroll lock,
+// backdrop click, and moving focus into the panel.
 export default function WorkLightbox({ study, onClose, benchmarkFootnote }: WorkLightboxProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const titleId = study ? `lightbox-title-${study.slug}` : undefined;
 
-  // Escape key closes the modal. Captured on the document so any keydown fires
-  // this handler regardless of focus.
+  // Bound on the document so Escape works regardless of focus.
   useEffect(() => {
     if (!study) return;
 
@@ -61,7 +58,6 @@ export default function WorkLightbox({ study, onClose, benchmarkFootnote }: Work
     return () => document.removeEventListener("keydown", handleEscape);
   }, [study, onClose]);
 
-  // Scroll lock: body overflow hidden while the modal is open. Removed on cleanup.
   useEffect(() => {
     if (!study) return;
 
@@ -72,14 +68,9 @@ export default function WorkLightbox({ study, onClose, benchmarkFootnote }: Work
     };
   }, [study]);
 
-  // Focus moves to the panel when it opens (via useRef + Reveal's scroll-sync
-  // hook pattern would be overkill here since this is just setState, not a scroll
-  // reveal — manual ref.focus() is simpler). Focus trap is minimal: Tab cycles
-  // through the panel's focusable elements only, wrapping at edges.
   useEffect(() => {
     if (!study || !panelRef.current) return;
 
-    // Move focus into the panel so keyboard navigation stays contained.
     const focusableElements = panelRef.current.querySelectorAll(
       "button, a, input, [tabindex]:not([tabindex='-1'])"
     );
@@ -90,8 +81,7 @@ export default function WorkLightbox({ study, onClose, benchmarkFootnote }: Work
 
   if (!study) return null;
 
-  // Backdrop click handler: only closes if clicking the backdrop itself
-  // (e.target === backdrop), not if clicking inside the panel.
+  // Only the backdrop itself closes — clicks inside the panel don't.
   function handleBackdropClick(e: React.MouseEvent<HTMLDivElement>) {
     if (e.target === e.currentTarget) {
       onClose();
@@ -112,7 +102,6 @@ export default function WorkLightbox({ study, onClose, benchmarkFootnote }: Work
         className="lightbox-panel relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-border bg-surface-raised shadow-(--shadow-card)"
       >
         <div className="space-y-8 p-8">
-          {/* Header: discipline label, title, outcome */}
           <div>
             <Label>{study.discipline}</Label>
             <h2 id={titleId} className="type-h2 mt-2">
@@ -121,19 +110,16 @@ export default function WorkLightbox({ study, onClose, benchmarkFootnote }: Work
             <p className="type-lead mt-4">{study.leadOutcome}</p>
           </div>
 
-          {/* Problem */}
           <div className="max-w-2xl">
             <h3 className="type-h3">Problem</h3>
             <p className="type-body mt-3">{study.problem}</p>
           </div>
 
-          {/* Solution */}
           <div className="max-w-2xl">
             <h3 className="type-h3">Solution</h3>
             <p className="type-body mt-3">{study.solution}</p>
           </div>
 
-          {/* Results: same branching logic as WorkBlock */}
           <div className="max-w-2xl">
             <h3 className="type-h3">Results</h3>
             <div className="mt-3">
@@ -149,7 +135,7 @@ export default function WorkLightbox({ study, onClose, benchmarkFootnote }: Work
             </div>
           </div>
 
-          {/* Visual: canvas (compact), figure, or facts fallback */}
+          {/* Visual, in order of preference: canvas, figures, facts fallback. */}
           {study.canvas ? (
             <div>
               <h3 className="type-h3 mb-4">The flow</h3>
@@ -157,8 +143,6 @@ export default function WorkLightbox({ study, onClose, benchmarkFootnote }: Work
             </div>
           ) : study.figures ? (
             <div className="space-y-4">
-              {/* Only for studies whose screenshot *is* the flow (CS4) — elsewhere
-                  the figure captions already label themselves. */}
               {study.visualHeading ? <h3 className="type-h3 mb-4">{study.visualHeading}</h3> : null}
               {study.figures.map((figure) => (
                 <Figure key={figure.src} {...figure} />
@@ -169,14 +153,12 @@ export default function WorkLightbox({ study, onClose, benchmarkFootnote }: Work
             <LightboxFacts facts={study.quickFacts} />
           )}
 
-          {/* Tags */}
           <div className="flex flex-wrap gap-2">
             {study.tags.map((tag) => (
               <Tag key={tag}>{tag}</Tag>
             ))}
           </div>
 
-          {/* Link to full case study page */}
           <Link
             href={`/work/${study.slug}`}
             className="type-label inline-block hover:text-accent-text"

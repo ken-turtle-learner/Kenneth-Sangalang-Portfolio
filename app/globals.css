@@ -2,37 +2,25 @@
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/* ---- Color tokens ---- */
-/* Light is the default palette: a warm near-white "sunset sky" (cream ->
-   peach -> pink -> rose) pushed close to white, so it reads as a whisper of
-   color rather than a visible gradient. It lives in bare :root — not behind
-   a data-theme attribute — so the server-rendered HTML is already correct
-   and there is nothing to flash on first paint. Dark overrides live under
-   [data-theme="dark"] and are flipped in before paint by
-   NO_FLASH_THEME_SCRIPT for visitors who previously chose dark. */
+/* ---- Color tokens ----
+   Light is the default and lives in bare :root, not behind a data-theme
+   attribute, so the server-rendered HTML is already correct and nothing
+   flashes on first paint. Dark overrides sit under [data-theme="dark"] and are
+   applied before paint by NO_FLASH_THEME_SCRIPT (lib/theme.ts). */
 :root {
-  /* body's own background, sitting below the fixed .bg-gradient-layer —
-     matches the gradient's bottom stop as a defensive fallback for anywhere
-     the fixed layer doesn't reach (content taller than one viewport captured
-     in a single non-scrolling render, print). */
   --bg: #fdf6f8;
   --bg-grad-top: #fffdfb;
   --bg-grad-upper: #fff6ef;
   --bg-grad-lower: #fff2f3;
   --bg-grad-bottom: #fdf6f8;
-  /* Slightly more opaque than a plain white wash so cards still read as
-     distinct objects against this very pale backdrop. */
   --surface: rgba(255, 255, 255, 0.85);
   --surface-raised: rgba(255, 255, 255, 0.95);
   --border: rgba(15, 38, 71, 0.12);
   --border-strong: rgba(15, 38, 71, 0.2);
   --text: #0f2647;
   --text-secondary: #3d5878;
-  /* #527093 clears 4.5:1 with margin (~5:1) against every surface in this
-     theme while staying in the same muted blue-gray family, visibly lighter
-     than --text-secondary. Do not lighten it further: .type-small is 15px,
-     below the WCAG large-text threshold, so it needs the full 4.5:1. An
-     earlier #6B819E measured only ~3.3-3.9:1 and was a real AA failure. */
+  /* Do not lighten: .type-small is 15px, below the WCAG large-text threshold,
+     so this needs the full 4.5:1 against every surface in the theme. */
   --text-muted: #527093;
   --accent: #0d9488;
   --accent-text: #115e59;
@@ -44,11 +32,9 @@
   --font-newsreader-weight-body: 400;
 }
 
-/* Dark navy at dusk. The gradient tokens are deliberately asymmetric between
-   the two themes — light blends four stops (top/upper/lower/bottom), dark
-   blends three (bg/mid/bottom) — which is why each theme also carries its own
-   .bg-gradient-layer rule further down. --bg-grad-upper/--bg-grad-lower are
-   simply left unused here rather than redefined. */
+/* Dark navy. The gradient tokens are asymmetric between themes — light blends
+   four stops, dark blends three — so each theme carries its own
+   .bg-gradient-layer rule below. --bg-grad-upper/lower go unused here. */
 :root[data-theme="dark"] {
   --bg: #0a1628;
   --bg-grad-top: #12203a;
@@ -68,10 +54,8 @@
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
-/* ---- Tailwind theme mapping ----
-   Exposes the color/font CSS variables above as Tailwind utility classes
-   (bg-accent, text-text-secondary, font-display, etc.) via Tailwind v4's
-   CSS-first @theme config, instead of a tailwind.config.js theme object. */
+/* Exposes the tokens above as Tailwind utilities (bg-accent, font-display, …)
+   via Tailwind v4's CSS-first @theme, in place of a tailwind.config.js. */
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -92,28 +76,16 @@
 }
 
 /* ---- Base ---- */
-/* Anchor-nav clicks (e.g. "See the work" -> #work) smooth-scroll. Paired
-   with the html[data-scroll-behavior="smooth"] attribute set in
-   app/layout.tsx, which tells Next.js's router this smooth-scroll is
-   author-chosen, so client-side route navigations (e.g. clicking into
-   /work/[slug]) still jump instantly instead of animating — Next 16 removed
-   its own override that used to guarantee that distinction automatically. */
+/* Paired with html[data-scroll-behavior="smooth"] in app/layout.tsx, which
+   tells the Next router this is author-chosen so route changes still jump. */
 html {
   scroll-behavior: smooth;
 }
 
-/* <main id="main-content"> (app/layout.tsx) is `flex flex-col`, so every
-   top-level section is a flex item in the cross (horizontal) axis. Flex
-   items default to `min-width: auto` (their content's min-content size),
-   which can let a section containing an unshrinkable-width row (e.g.
-   FunnelStrip's horizontal scroller) force the whole page wider than the
-   viewport instead of scrolling internally. The actual fix for that
-   specific bug turned out to be simpler — every section needs an explicit
-   `w-full` so it stretches to main's width instead of sizing to its own
-   content (see components/Section.tsx, which already had it — a page that
-   skips Section and rolls its own wrapper needs to add it too). This rule
-   is a defensive backstop for that same class of bug on anything that
-   doesn't go through Section. */
+/* Defensive backstop: <main> is `flex flex-col`, and a flex item's default
+   min-width: auto lets a section with an unshrinkable row force the whole page
+   wider than the viewport. Sections that go through components/Section.tsx
+   already avoid this with w-full; one that rolls its own wrapper needs it too. */
 #main-content > * {
   min-width: 0;
 }
@@ -142,9 +114,6 @@ h4,
   position: fixed;
   inset: 0;
   z-index: -1;
-  /* The warm radial is held at 0.18 opacity to match the pale palette above:
-     it should read as a hint of warmth behind the hero, not a visible peach
-     patch. */
   background:
     radial-gradient(ellipse 100% 60% at 50% 0%, rgba(255, 214, 175, 0.18) 0%, transparent 65%),
     linear-gradient(
@@ -156,7 +125,6 @@ h4,
     );
 }
 
-/* Dark's three-stop variant — see the token-asymmetry note above. */
 :root[data-theme="dark"] .bg-gradient-layer {
   background:
     radial-gradient(ellipse 120% 80% at 50% -10%, var(--bg-grad-top) 0%, transparent 60%),
@@ -164,14 +132,15 @@ h4,
 }
 
 /* ---- Type scale ----
-   Each class maps to one role in the three-voice type system: Montserrat
-   (display/heading/UI — the "structure" voice, geometric and confident),
-   Newsreader serif (prose/body — the "human" voice, kept from the original
-   pairing since a humanist serif is exactly what a geometric sans like
-   Montserrat wants next to it for contrast), IBM Plex Mono (metrics/labels/
-   tags — the "machine/data" voice). Components apply these instead of ad
-   hoc Tailwind text-* utilities so every heading/stat/label across the
-   site stays visually consistent. */
+   Three voices: Montserrat (display/heading/UI), Newsreader (prose/body),
+   IBM Plex Mono (metrics/labels/tags). Components apply these classes instead
+   of ad hoc text-* utilities so type stays consistent site-wide.
+
+   IMPORTANT: these rules are unlayered, and Tailwind's utilities live in
+   @layer utilities — so a .type-* class always beats a text-* or max-w-*
+   utility on the same element, no matter the class order. That's why several
+   variants below exist as their own classes rather than as a base class plus
+   a size utility. */
 .type-display {
   font-size: clamp(2.75rem, 7vw, 5.5rem);
   font-weight: 600;
@@ -179,19 +148,10 @@ h4,
   line-height: 0.95;
 }
 
-/* .type-display is sized for short, punchy strings — a two-word name, "Let's
-   talk." At 5.5rem a full sentence becomes unreadable, so the hero headline
-   (which is now a complete sentence, not the name) steps the ceiling down and
-   opens the leading back up. Pair it with a max-w-[20ch] on the element.
-
-   3.5rem is the floor for this ceiling, not an arbitrary pick: .type-h2 caps
-   at 3rem, so this leaves an 8px step keeping the hero ranked above section
-   headings. Drop it further and that hierarchy flattens. The 2.25rem lower
-   bound is deliberately left where it is — on mobile the clamp already sits
-   on its floor, so only the ceiling and the vw term affect desktop.
-
-   Only the hero h1 uses this modifier; the shared .type-display base above
-   is what four other headings render at, so retune here, never there. */
+/* For the hero, whose headline is a full sentence rather than the short
+   strings .type-display is sized for. 3.5rem is the floor for this ceiling,
+   not an arbitrary pick: .type-h2 caps at 3rem, so this keeps the hero ranked
+   above section headings. Pair it with a max-w-[20ch] on the element. */
 .type-display--sentence {
   font-size: clamp(2.25rem, 5vw, 3.5rem);
   line-height: 1.05;
@@ -209,27 +169,16 @@ h4,
   font-weight: 600;
 }
 
-/* Title line inside an automation-canvas node (components/CanvasNode.tsx, plus
-   the branch header AutomationCanvas draws inline). Deliberately its own class
-   rather than `.type-h3 text-base`, which is what these used to say: the
-   type-scale classes in this file are unlayered and Tailwind's utilities live
-   in @layer utilities, so an unlayered .type-h3 beats .text-base no matter the
-   specificity — the utility never applied and every node title rendered at
-   24px inside a ~130px branch column, spilling out of its card. Same cascade
-   mechanic the .canvas-node--exit rule further down relies on deliberately.
-
-   Line height is tighter than the body scale because these titles routinely
-   wrap to two or three lines in the narrow branch columns. */
+/* Title line inside an automation-canvas node. Line height is tighter than the
+   body scale because these wrap to two or three lines in the branch columns. */
 .type-node-title {
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.35;
 }
 
-/* Fourth heading level, introduced for the Problem/Solution/Results/The flow
-   subheaders inside a work block. Deliberately small and wide-tracked rather
-   than just "a smaller h3" — at this level it's labelling a passage, so it
-   should read closer to the mono eyebrows than to a title. */
+/* Labels a passage rather than titling one, so it reads closer to the mono
+   eyebrows than to a heading. */
 .type-h4 {
   font-size: 1rem;
   font-weight: 600;
@@ -272,22 +221,12 @@ h4,
   font-variant-numeric: tabular-nums;
 }
 
-/* Title, body copy, and stat tile for the Featured Work cards
-   (components/WorkCard.tsx). Three sibling classes rather than
-   `type-h3 text-xl` / `type-body text-base` / `type-stat text-4xl`, for the
-   same cascade reason spelled out at .type-node-title above: these .type-*
-   rules are unlayered and Tailwind's size utilities live in @layer utilities,
-   so .type-h3's 1.5rem would win over any utility regardless of class order.
-
-   Stepped down one notch from the page scale because the cards were ~500px
-   tall and dominating the section — at card size these are index entries that
-   get you into the lightbox, not the passage of copy the h3/body scale is
-   built for. */
+/* Card-scale versions of the heading/body/stat classes, for the Featured Work
+   cards. One step down from the page scale — at card size these are index
+   entries into the lightbox, not a passage of copy. */
 .type-card-title {
   font-size: 1.25rem;
   font-weight: 600;
-  /* Tighter than the browser default because every card title wraps to two
-     lines at this width. */
   line-height: 1.3;
 }
 
@@ -296,13 +235,9 @@ h4,
   font-size: 1rem;
   line-height: 1.6;
   color: var(--text-secondary);
-  /* .type-body's max-width: 68ch is deliberately dropped — the card is
-     already narrower than that measure. */
+  /* No max-width: the card is already narrower than .type-body's measure. */
 }
 
-/* The headlineMetric shown in place of a thumbnail. .type-stat's 3.5rem was
-   sized for a full-width stat block; in the card's shorter image band the
-   longest metric ("7 courses · 50 students") would swallow the tile. */
 .type-card-stat {
   font-family: var(--font-mono), monospace;
   font-size: clamp(1.75rem, 3vw, 2.5rem);
@@ -347,10 +282,9 @@ h4,
 }
 
 /* ---- Motion ----
-   .reveal / .reveal--visible: base state for components/Reveal.tsx — starts
-   invisible + shifted down, then this class flips in once the shared
-   IntersectionObserver (lib/observer.ts) reports the element on screen.
-   --i is set per-instance by Reveal to stagger siblings 60ms apart. */
+   Base state for components/Reveal.tsx. --i is set per instance to stagger
+   siblings 60ms apart; .reveal--visible is added once the shared observer
+   (lib/observer.ts) reports the element on screen. */
 .reveal {
   opacity: 0;
   transform: translateY(16px);
@@ -365,10 +299,8 @@ h4,
   transform: translateY(0);
 }
 
-/* components/BenchmarkTrack.tsx's fill bar. Starts at 0 width and only
-   grows to its target (--fill, set inline per-instance) once wrapped in a
-   Reveal that has become visible — mirrors the same reveal-gating trick as
-   .reveal above, but for a width transition instead of opacity/transform. */
+/* components/BenchmarkTrack.tsx's fill bar: starts at 0 and grows to --fill
+   (set inline per instance) once an ancestor Reveal becomes visible. */
 .benchmark-bar-fill {
   width: 0;
   transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -387,18 +319,11 @@ h4,
 }
 
 /* ---- Pointer response ----
-   Every clickable control on the site grows slightly under the cursor. Lives
-   here as a class rather than as Tailwind `hover:scale-*` utilities for two
-   reasons: the transition list has to be shared by ten call sites, and a
-   `transition-*` utility would lose anyway anywhere this class lands on an
-   element that also carries an unlayered rule (see the .type-node-title note
-   above for why unlayered always beats @layer utilities).
+   Every clickable control grows slightly under the cursor.
 
-   The property list names `scale` and `translate`, NOT `transform`. Tailwind
-   v4's scale and translate utilities set those two standalone CSS properties,
-   so `transition-[transform,...]` — what WorkCard and ContactCard used to
-   carry — transitioned a property neither of them ever changed, and their
-   hover lift snapped rather than eased. */
+   The property list names `scale` and `translate`, NOT `transform`: Tailwind
+   v4's scale/translate utilities set those two standalone CSS properties, so
+   transitioning `transform` here would ease nothing and the lift would snap. */
 .hover-grow {
   transition:
     scale 200ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -410,9 +335,8 @@ h4,
 }
 
 /* Gated on a real hovering pointer: on touch, :hover sticks after a tap and
-   would leave the last-tapped card sitting grown until something else is
-   tapped. :focus-visible and :active below are unguarded — both are real on
-   touch and on keyboard. */
+   would leave the last-tapped card grown. :focus-visible and :active below are
+   unguarded, since both are real on touch and keyboard. */
 @media (hover: hover) {
   .hover-grow:hover {
     scale: 1.04;
@@ -429,8 +353,7 @@ h4,
   scale: 1.04;
 }
 
-/* The 2xl work/contact cards are ~550px wide, where 1.04 reads as a lurch
-   rather than a nudge. They also keep their own hover:-translate-y-0.5. */
+/* The work/contact cards are wide enough that 1.04 reads as a lurch. */
 .hover-grow--subtle:focus-visible {
   scale: 1.02;
 }
@@ -443,30 +366,27 @@ h4,
   scale: 1;
 }
 
-/* Written to per-frame by components/RepelField.tsx: 0 when the cursor is out
-   of range of this pill, 1 when it's on top of it. Registered with @property
-   so it has a guaranteed <number> initial value — the colour mixes below then
-   resolve to plain --border/--text-secondary before any JS runs, which is the
-   state a crawler (and a no-JS visitor) sees. */
+/* Written per-frame by components/RepelField.tsx: 0 when the cursor is out of
+   range of a pill, 1 when it's on top of it. Registered with @property so it
+   has a guaranteed <number> initial value, which is what makes the colour mixes
+   below resolve correctly before any JS runs. */
 @property --near {
   syntax: "<number>";
   initial-value: 0;
   inherits: false;
 }
 
-/* The tech-strip pills. Unlayered, so these two colours beat the
-   `border-border text-text-secondary` utilities on components/Tag.tsx.
-   Capped at 70% of the way to accent: a pill is fleeing the cursor the whole
-   time it's near one, so a full-accent state would only ever flash. */
+/* The tech-strip pills. Unlayered, so these colours beat the utility classes on
+   components/Tag.tsx. Capped at 70% toward accent: a pill flees the cursor the
+   whole time it's near, so a full-accent state would only ever flash. */
 .repel-item {
   will-change: transform;
   border-color: color-mix(in oklab, var(--accent) calc(var(--near) * 70%), var(--border));
   color: color-mix(in oklab, var(--accent-text) calc(var(--near) * 70%), var(--text-secondary));
 }
 
-/* Lightbox modal fade-in animation, matching the site's reveal motion language
-   (cubic-bezier(0.22, 1, 0.36, 1)). Backdrop fades in quickly; panel fades in
-   and slides up from below. */
+/* Shared by WorkLightbox and ExpandableFigure. The `open` class is added a
+   frame after mount, so the transition has a starting state to animate from. */
 .lightbox-backdrop {
   opacity: 0;
   transition: opacity 300ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -489,11 +409,8 @@ h4,
   transform: translateY(0);
 }
 
-/* Collapses every transition/animation in the app to effectively-instant
-   rather than disabling them outright — elements still reach their final
-   state (bars filled, reveals visible, canvas fully drawn) immediately
-   instead of getting stuck mid-transition or requiring every component to
-   special-case this itself. */
+/* Collapses motion to effectively-instant rather than disabling it, so
+   elements still reach their final state instead of sticking mid-transition. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -509,8 +426,7 @@ h4,
     transform: none;
   }
 
-  /* Canvas renders fully drawn immediately — no pulse, no draw-in, no
-     staggered delay — regardless of whether it's scrolled into view yet. */
+  /* Canvas renders fully drawn immediately, scrolled into view or not. */
   .canvas-node,
   .canvas-wait-label {
     opacity: 1 !important;
@@ -522,11 +438,9 @@ h4,
     stroke-dashoffset: 0 !important;
   }
 
-  /* The blanket rule above only collapses transition *durations*, so without
-     these the grow would still happen — instantly, which is worse than not at
-     all. Colour and surface changes are kept: those are legibility, not
-     motion. (components/RepelField.tsx makes the same distinction in JS,
-     where no CSS media query can reach it.) */
+  /* The blanket rule above only collapses durations, so without this the grow
+     would still happen — instantly, which is worse than not at all. Colour
+     changes are kept: those are legibility, not motion. */
   .hover-grow:hover,
   .hover-grow:focus-visible,
   .hover-grow:active {
@@ -534,31 +448,23 @@ h4,
   }
 }
 
-/* ---- Automation canvas (components/AutomationCanvas.tsx,
-   components/FunnelStrip.tsx) — the site's signature visual, borrowed from
-   the ActiveCampaign/Zapier automation-builder vernacular. Both components
-   share this node/connector styling; only their layout direction (vertical
-   vs horizontal) differs. Activation is driven by a single class
-   (.automation-canvas--active / .funnel-strip--active) toggled once by the
-   shared IntersectionObserver — per rendering-animate-svg-wrapper, it's the
-   *wrapping* element's class that's animated/toggled, never the raw <svg>
-   manipulated directly. */
-/* min(..., 1200ms) caps the stagger — CS2's 11-email canvas has ~23 steps,
-   and an uncapped per-step delay would push the last node's activation out
-   several seconds, reading as broken/sluggish rather than "one orchestrated
-   moment." Every node still starts its 80ms-apart turn, but the whole
-   sequence settles within ~1.2s regardless of how many steps it has. */
+/* ---- Automation canvas ----
+   Shared by components/AutomationCanvas.tsx (vertical) and FunnelStrip.tsx
+   (horizontal); only their layout direction differs. Activation is driven by a
+   single class on the wrapper (.automation-canvas--active /
+   .funnel-strip--active), toggled once by the shared IntersectionObserver.
+
+   min(…, 1200ms) caps the stagger: an 11-email canvas runs ~23 steps, and an
+   uncapped per-step delay would push the last node out by several seconds. */
 .canvas-node {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1.125rem 1.25rem;
-  /* Nodes in the branch columns are flex children of a narrow column, and a
-     flex item defaults to min-width:auto (its min-content width) — so a long
-     title would push the card wider than its column instead of wrapping.
-     break-word then handles the leftover case: a single word longer than the
-     content box (e.g. "Re-engagement" at ~90px) painted outside the border
-     rather than breaking, which is the overflow this pair fixes. */
+  /* Nodes in the branch columns are flex children, which default to
+     min-width: auto — so a long title would push the card wider than its
+     column instead of wrapping. break-word covers the leftover case of a
+     single word longer than the content box. */
   min-width: 0;
   overflow-wrap: break-word;
   opacity: 0;
@@ -569,24 +475,23 @@ h4,
   transition-delay: min(calc(var(--i, 0) * 80ms), 1200ms);
 }
 
-/* The goal node keeps a permanent teal border/fill — every other node only
-   flashes teal briefly on activation (see canvas-node-pulse below). */
+/* The goal node keeps a permanent teal border and fill; every other node only
+   flashes teal on activation (see canvas-node-pulse below). */
 .canvas-node--goal {
   border-color: var(--accent);
   background: var(--accent-soft);
 }
 
-/* The inverse of the goal node: a dashed, muted box marking a path that
-   leaves the automation without converting. */
+/* The inverse: a dashed, muted box marking a path that leaves the automation
+   without converting. */
 .canvas-node--exit {
   border-style: dashed;
   background: transparent;
   color: var(--text-muted);
 }
 
-/* CanvasNode renders every node's label with an accent utility class; this
-   unlayered rule overrides it (Tailwind's utilities sit in a cascade layer),
-   so the exit's label doesn't stay teal against a muted card. */
+/* Unlayered, so it overrides the accent utility CanvasNode puts on every
+   label and the exit's label doesn't stay teal on a muted card. */
 .canvas-node--exit .type-node-label {
   color: var(--text-muted);
 }
@@ -597,8 +502,8 @@ h4,
   transform: translateY(0);
 }
 
-/* Exits are excluded from the pulse alongside goals — flashing accent teal
-   would undercut the muted treatment above. */
+/* Exits are excluded alongside goals — flashing accent teal would undercut the
+   muted treatment above. */
 .automation-canvas--active .canvas-node:not(.canvas-node--goal):not(.canvas-node--exit),
 .funnel-strip--active .canvas-node:not(.canvas-node--goal):not(.canvas-node--exit) {
   animation: canvas-node-pulse 900ms ease-out both;
@@ -616,10 +521,9 @@ h4,
   }
 }
 
-/* Connector line — pathLength="1" on the <line>/<path> lets stroke-dasharray
-   and stroke-dashoffset work in a 0-1 scale regardless of the connector's
-   real pixel length, so "draw from 0 to fully drawn" is just
-   dashoffset: 1 -> 0. */
+/* pathLength="1" on the <line> lets dasharray/dashoffset work on a 0-1 scale
+   regardless of the connector's real pixel length, so "draw in" is just
+   dashoffset 1 -> 0. */
 .canvas-connector-line {
   stroke: var(--border-strong);
   stroke-width: 2;
@@ -649,9 +553,8 @@ h4,
   opacity: 1;
 }
 
-/* Visually-hidden but screen-reader-accessible — used for the canvas's
-   plain-text equivalent (see AutomationCanvas.tsx), since the visual
-   SVG/card version is marked aria-hidden. */
+/* Visually hidden but readable by screen readers — used for the canvas's
+   plain-text equivalent, since the visual version is aria-hidden. */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -664,7 +567,6 @@ h4,
   border: 0;
 }
 
-/* ---- Print (base reset; /resume adds its own detailed layout) ---- */
 @media print {
   .no-print {
     display: none !important;

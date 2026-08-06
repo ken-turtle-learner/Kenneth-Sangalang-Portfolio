@@ -7,12 +7,9 @@ type ResultsTableProps = {
   metricsNote?: string;
 };
 
-// Renders one of three shapes depending on what evidence a case study
-// actually has (see the resultsType comment in content/case-studies.ts):
-// a benchmark comparison, a real before/after (CS1 only), or — where
-// there's no metric at all — the honest metricsNote instead of a table.
-// <th scope="col"> throughout per the accessibility floor's results-table
-// requirement.
+// Renders one of three shapes depending on a study's `resultsType`: a
+// benchmark comparison, a before/after, or — where there's no metric —
+// the metricsNote paragraph instead of a table.
 export default function ResultsTable({
   resultsType,
   benchmarkResults,

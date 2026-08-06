@@ -6,17 +6,8 @@ import Image from "next/image";
 import type { Figure as FigureData } from "@/content/case-studies";
 
 // A case study screenshot that opens full-size in an overlay when clicked.
-//
-// This is the interactive counterpart to components/Figure.tsx (still used by
-// WorkLightbox, which must stay a Server-rendered figure — see the scroll-lock
-// note below). The two render the same markup when collapsed; this one adds the
-// button wrapper, the zoom affordance, and the overlay.
-//
-// The escape / scroll-lock / focus plumbing below is deliberately a copy of the
-// same logic in WorkLightbox.tsx rather than a shared hook: the two modals are
-// never open at once and factoring them together would mean editing the work
-// modal, which this change is scoped out of. Worth revisiting if a third one
-// appears.
+// components/Figure.tsx is the static counterpart used inside WorkLightbox,
+// which can't nest a second modal.
 export default function ExpandableFigure({
   src,
   alt,
@@ -26,9 +17,9 @@ export default function ExpandableFigure({
   thumbnail,
 }: FigureData) {
   const [isOpen, setIsOpen] = useState(false);
-  // Drives the fade-in. The overlay mounts without `open` and gains it on the
-  // next frame, because a CSS transition doesn't fire on an element that was
-  // already painted in its final state.
+  // Drives the fade-in. The overlay mounts without `open` and gains it a frame
+  // later, because a CSS transition won't fire on an element already painted in
+  // its final state.
   const [isVisible, setIsVisible] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -36,11 +27,10 @@ export default function ExpandableFigure({
   const close = useCallback(() => {
     setIsOpen(false);
     setIsVisible(false);
-    // Return focus to the thumbnail that opened the overlay.
     triggerRef.current?.focus();
   }, []);
 
-  // Escape closes. Bound on the document so it fires regardless of focus.
+  // Bound on the document so Escape works regardless of focus.
   useEffect(() => {
     if (!isOpen) return;
 
@@ -52,7 +42,6 @@ export default function ExpandableFigure({
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, close]);
 
-  // Scroll lock while the overlay is up, restoring whatever was there before.
   useEffect(() => {
     if (!isOpen) return;
 
@@ -63,8 +52,8 @@ export default function ExpandableFigure({
     };
   }, [isOpen]);
 
-  // Move focus into the overlay and trigger the fade, both one frame after
-  // mount so the transition has a starting state to animate from.
+  // Focus and fade both happen a frame after mount, so the transition has a
+  // starting state to animate from.
   useEffect(() => {
     if (!isOpen) return;
 
@@ -75,15 +64,10 @@ export default function ExpandableFigure({
     return () => cancelAnimationFrame(frame);
   }, [isOpen]);
 
-  // Only closes on the backdrop itself, not on clicks that land on the image.
   function handleBackdropClick(e: React.MouseEvent<HTMLDivElement>) {
     if (e.target === e.currentTarget) close();
   }
 
-  // Thumbnails cap at max-w-lg (512px) — under half the container, but the
-  // automation screenshots have a lot of empty canvas around a narrow flow, and
-  // anything smaller reduced them to an unreadable smudge. Everything else
-  // fills the container, which tops out at --container-page minus its padding.
   const sizes = thumbnail
     ? "(min-width: 640px) 512px, 100vw"
     : "(min-width: 1200px) 1092px, 100vw";
@@ -106,14 +90,12 @@ export default function ExpandableFigure({
             sizes={sizes}
             className="h-auto w-full"
           />
-          {/* Appends to the button's accessible name, which otherwise reads as
-              the image alt alone and never says the image is interactive. */}
+          {/* Appends to the button's accessible name, which would otherwise be
+              the image alt alone and never say the image is interactive. */}
           <span className="sr-only"> — click to enlarge</span>
-          {/* Decorative: the sr-only text above already carries this meaning.
-              Sits at a resting opacity rather than fully hidden — a hover-only
-              affordance left the shrunken thumbnail looking like a static image
-              with nothing to say it opens. Goes solid on hover and on keyboard
-              focus, so it isn't mouse-only. */}
+          {/* Zoom affordance. Sits at a resting opacity rather than appearing
+              only on hover, so it reads as interactive on first sight, and goes
+              solid on keyboard focus too. */}
           <span
             aria-hidden="true"
             className="absolute right-3 bottom-3 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface-raised text-text-secondary opacity-70 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
@@ -136,12 +118,9 @@ export default function ExpandableFigure({
         <figcaption className="type-small mt-2">{caption}</figcaption>
       </figure>
 
-      {/* Portalled to document.body rather than rendered in place. The page
-          wraps every figure in components/Reveal, whose `transform` makes it a
-          containing block for fixed-position descendants — left inline, the
-          backdrop's `inset-0` resolved against the Reveal's box instead of the
-          viewport, so the overlay appeared as a dark band across the middle of
-          the page and the image was capped to the column width. */}
+      {/* Portalled to document.body: components/Reveal wraps every figure and
+          its `transform` makes it a containing block, so an inline overlay
+          would size `inset-0` against the Reveal instead of the viewport. */}
       {isOpen
         ? createPortal(
             <div
@@ -154,10 +133,9 @@ export default function ExpandableFigure({
                 aria-modal="true"
                 aria-label={caption}
                 className="lightbox-panel relative"
-                // Widened to the image's natural resolution, then clamped by
-                // both viewport axes — the third term is the width at which the
-                // image would hit 85vh tall, which keeps portrait shots from
-                // running off the bottom.
+                // Natural width, clamped by both viewport axes. The third term
+                // is the width at which the image would hit 85vh tall, which
+                // keeps portrait shots from running off the bottom.
                 style={{
                   width: `min(90vw, ${width}px, ${((width / height) * 85).toFixed(2)}vh)`,
                 }}
@@ -181,11 +159,9 @@ export default function ExpandableFigure({
                   onClick={close}
                   className="h-auto w-full cursor-zoom-out rounded-xl"
                 />
-                {/* Matches .type-small's font and size but not its colour.
-                    .type-small is unlayered CSS, so it beats any Tailwind
-                    utility regardless of specificity — using it here left the
-                    caption in muted slate on the black scrim, at roughly 1.5:1
-                    contrast. Restated inline so the light-on-dark colour holds. */}
+                {/* Styled inline rather than with .type-small: that class is
+                    unlayered CSS, so its muted colour would beat any Tailwind
+                    text utility and leave the caption unreadable on the scrim. */}
                 <p className="mt-3 text-center text-[0.9375rem] text-white/90 font-body">
                   {caption}
                 </p>

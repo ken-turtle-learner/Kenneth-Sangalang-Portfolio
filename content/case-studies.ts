@@ -1,20 +1,6 @@
-// All four case studies below are transcribed from
-// content-source/Kenneth_Sangalang_Career_Profile.md (the "Case Study
-// Source Notes" sections) and Kenneth_Sangalang_Master_Resume.md, plus a
-// few facts Kenneth confirmed directly in conversation (the 48% pre-launch
-// baseline for CS1, and the coaching-portal scope for CS4 — see the build
-// plan's "Resolved flags" section for the full paper trail). Nothing here
-// should be invented: `process`/`learnings` are left undefined wherever the
-// source material didn't actually say anything, rather than padded out.
-
-// A single automation-canvas node: one box in the ActiveCampaign/Zapier-
-// style diagram (see components/AutomationCanvas).
-//
-// "exit" is a path that leaves the automation without converting — CS4's
-// suppression branch routes already-purchased contacts out to other
-// automations. It exists as its own kind because "goal" carries permanent
-// teal highlight styling (see CanvasNode/.canvas-node--goal), which would
-// read that dead end as a win.
+// One box in the automation diagram (components/AutomationCanvas).
+// "exit" is a path that leaves the automation without converting; it's separate
+// from "goal" because goal nodes carry permanent teal highlight styling.
 export type AutomationNode = {
   id: string;
   kind: "trigger" | "email" | "wait" | "goal" | "exit";
@@ -23,8 +9,7 @@ export type AutomationNode = {
   metric?: string;
 };
 
-// A branching point in the canvas (CS1's "did they finish?" split) — models
-// two labeled outcomes, each continuing into its own list of nodes.
+// A split in the canvas: two labeled outcomes, each with its own list of nodes.
 export type AutomationBranch = {
   id: string;
   kind: "branch";
@@ -33,18 +18,11 @@ export type AutomationBranch = {
   outcomes: { label: string; nodes: AutomationNode[] }[];
 };
 
-// A canvas is just an ordered list of these two step shapes.
 export type CanvasStep = AutomationNode | AutomationBranch;
 
-// "Result vs. industry median" row (used where there's no real before-state
-// to compare against, e.g. CS2/CS4 — comparing against a benchmark is the
-// honest framing there instead of a fabricated Before column).
-//
-// `resultValue`/`comparisonValue` are numeric twins of the display strings,
-// used by components/BenchmarkPanel.tsx to size its bars. They exist because
-// the old Proof section hardcoded those same numbers as literals while
-// reading the strings from here — so editing this file silently didn't move
-// the bars. Keep each pair in sync.
+// "Result vs. industry median" row.
+// resultValue/comparisonValue are numeric twins of the display strings and size
+// the bars in components/BenchmarkPanel.tsx — keep each pair in sync.
 export type BenchmarkRow = {
   label: string;
   result: string;
@@ -53,8 +31,8 @@ export type BenchmarkRow = {
   comparisonValue?: number;
 };
 
-// "Before -> After" row (used only for CS1, which is the one case study
-// with a genuine pre-launch baseline — see the 48% note above).
+// "Before → After" row, for studies with a real pre-launch baseline.
+// beforeValue/afterValue are the numeric twins — keep them in sync too.
 export type BeforeAfterRow = {
   label: string;
   before: string;
@@ -64,21 +42,16 @@ export type BeforeAfterRow = {
   afterValue: number;
 };
 
-// `width`/`height` are the image's real pixel dimensions. They're optional and
-// default to 1200x750 in components/Figure.tsx, but every real screenshot here
-// should set them: Figure sizes its box from these, so a wrong ratio means the
-// object-fit crops the screenshot rather than showing all of it.
 export type Figure = {
   src: string;
   alt: string;
   caption: string;
+  // The image's real pixel dimensions. Optional (components/Figure.tsx defaults
+  // to 1200x750) but always set them: a wrong ratio crops the screenshot.
   width?: number;
   height?: number;
-  // Renders this figure at reduced width on the case study page instead of
-  // letting it span the full container. Set only where the image would
-  // otherwise swamp the page — CS1's automation screenshot sits directly under
-  // an already-full-width AutomationCanvas, so two big flow diagrams stack up.
-  // The full-size image is still one click away via components/ExpandableFigure.
+  // Renders at reduced width on the case study page. Full size is one click
+  // away via components/ExpandableFigure.
   thumbnail?: boolean;
 };
 
@@ -90,16 +63,12 @@ export type QuickFacts = {
   impact: string;
 };
 
-// One case study, driving both its home-page work block and its /work/[slug]
-// page. `process` and `learnings` are optional and intentionally omitted
-// on studies where the source docs didn't give real material — the
-// /work/[slug] page skips rendering those sections rather than showing
-// empty headings.
+// One case study, driving both its home-page card and its /work/[slug] page.
 export type CaseStudy = {
   slug: string;
   discipline: string;
   title: string;
-  // One-liner for the home page work block.
+  // One-liner for the home page card.
   cardOutcome: string;
   // Fuller framing sentence for the case study page's lead paragraph.
   leadOutcome: string;
@@ -108,69 +77,42 @@ export type CaseStudy = {
   quickFacts: QuickFacts;
   overview: string;
   problem: string;
+  // Optional sections. Omit them rather than padding — /work/[slug] skips the
+  // heading entirely when they're undefined.
   process?: string[];
   solution: string;
-  // Which results shape to render — see BenchmarkRow/BeforeAfterRow above
-  // for why this varies per case study instead of being uniform.
+  // Which results shape to render. "operational" shows metricsNote instead of
+  // a table, for work with no conversion metric behind it.
   resultsType: "benchmark" | "before-after" | "operational";
   benchmarkResults?: BenchmarkRow[];
   beforeAfterResults?: BeforeAfterRow[];
-  // Honesty line for "operational" case studies with no real metric to show
-  // (CS3, CS4) — states plainly that no number exists, instead of omitting
-  // the topic and letting its absence look like an oversight.
   metricsNote?: string;
   learnings?: string[];
-  // Plain statement of what Kenneth did/didn't do on this project — every
-  // case study renders one, per the plan's non-negotiable on not overclaiming.
+  // What Kenneth did and didn't do. Every case study renders one.
   roleAttribution: string;
   canvas?: CanvasStep[];
   figures?: Figure[];
-  // The visual that renders beside the header on /work/[slug] — currently CS1's
-  // phone mockup. Deliberately kept out of `figures` rather than added as its
-  // first entry: WorkCard reads figures[cardFigureIndex ?? 0] for the home-grid
-  // thumbnail and WorkLightbox maps the whole array, so a new entry there would
-  // silently change both surfaces. Rendered directly by the page, not through
-  // components/Figure.tsx, since the mockup is a transparent PNG and Figure's
-  // border would draw a box around empty space.
+  // The visual beside the header on /work/[slug]. Kept out of `figures` on
+  // purpose: WorkCard reads figures[cardFigureIndex ?? 0] and WorkLightbox maps
+  // the whole array, so adding it there would change both surfaces.
   heroFigure?: Figure;
-  // Heading over the lightbox's figure block, for studies whose screenshot *is*
-  // the flow (CS4 shows the real ActiveCampaign canvas, so it gets "The flow"
-  // just like the drawn canvases do). Left undefined where the figures are
-  // ordinary screenshots and their captions already say enough.
+  // Heading over the lightbox's figure block, for studies whose screenshot is
+  // itself the flow. Omit where the captions already say enough.
   visualHeading?: string;
-  // Which visual the Featured Work grid card shows. Defaults to the first
-  // figure when one exists, falling back to the headlineMetric tile. CS4 pins
-  // "metric" because its figure is a dense automation screenshot that reads as
-  // unreadable chrome at thumbnail size, while "50.78% open" lands instantly.
+  // What the home-page card shows. Defaults to the first figure, falling back
+  // to the headlineMetric tile. Set "metric" when the figure is unreadable at
+  // thumbnail size.
   cardVisual?: "figure" | "metric";
-  // Which figure the Featured Work card shows, when it shouldn't be the first
-  // one. Defaults to 0. CS3's figures run in flow order (welcome first), but
-  // the welcome screen is a paragraph of text at thumbnail size — the reframe
-  // screen is the frame that shows the conditional payoff, so its card points
-  // at that one instead without disturbing the flow order everywhere else.
+  // Which figure the card shows, when it shouldn't be the first. Defaults to 0.
   cardFigureIndex?: number;
   creditLine?: string;
 };
 
-// Array order is display order, on the home page and for the prev/next links
+// Array order is display order — on the home page, and for the prev/next links
 // on /work/[slug].
-//
-// The re-engagement campaign leads because it's the one project attributable
-// to Kenneth end to end — strategy, copy, build, QA, and a real measured
-// result. The WordPress/REST build follows so the two most technical and the
-// two most marketing-side studies alternate, and the 11-email sequence sits
-// last: it's the strongest single number on the site, but leading with it (as
-// this list used to) made the whole portfolio read as an email specialist's.
 export const caseStudies: CaseStudy[] = [
-  // CS1 — the only case study with a genuine pre-launch baseline (48%,
-  // confirmed by Kenneth directly rather than sourced from the docs), so
-  // it's the one that gets a real before/after table instead of a
-  // benchmark comparison.
   {
     slug: "so-tool-reengagement",
-    // Lifecycle/segmentation leads the label because that's what the build
-    // actually was; "Email Marketing" stays because the send itself genuinely
-    // was an email campaign, and dropping it would overcorrect into inaccuracy.
     discipline: "Lifecycle Automation · Email Marketing",
     title: "Getting leads from 48% to 63% completion on a self-discovery tool",
     cardOutcome: "A re-engagement campaign that lifted lead-magnet completion by 15 points.",
@@ -218,9 +160,8 @@ export const caseStudies: CaseStudy[] = [
         caption: "The re-engagement automation in ActiveCampaign",
         width: 798,
         height: 743,
-        // The drawn AutomationCanvas directly above this already spans the full
-        // container; showing a second full-width flow diagram underneath it made
-        // the page read as one long picture. Click to see it at full size.
+        // Sits directly under a full-width AutomationCanvas; two full-width flow
+        // diagrams stacked read as one long picture.
         thumbnail: true,
       },
     ],
@@ -300,9 +241,8 @@ export const caseStudies: CaseStudy[] = [
       "No completion or conversion metrics exist for this flow specifically — it's tracked separately from the SO Tool's own 63% completion figure.",
     roleAttribution:
       "Kenneth designed the UI and built the flow logic in WeWeb from a design spec the client provided. He did not originate the underlying content or copy strategy for this flow.",
-    // Flow order, matching the sequence a user actually walks through. The card
-    // thumbnail is pinned to the reframe screen via cardFigureIndex below rather
-    // than reordering these.
+    // Flow order, matching the sequence a user walks through. The card thumbnail
+    // is pinned to the reframe screen via cardFigureIndex below.
     figures: [
       {
         src: "/work/onboarding-sequence/1.png",
@@ -340,8 +280,7 @@ export const caseStudies: CaseStudy[] = [
         height: 707,
       },
     ],
-    // The reframe screen, not the welcome one — it's the only frame that shows
-    // the conditional payoff in a single image.
+    // The reframe screen — the only frame showing the conditional payoff.
     cardFigureIndex: 4,
     creditLine: "Super Objective™ is a trademark of Brave Leadership.",
   },
@@ -392,15 +331,9 @@ export const caseStudies: CaseStudy[] = [
     ],
     roleAttribution:
       "Body copy for this sequence was written by someone else. Kenneth built and implemented the automation in ActiveCampaign, QA'd and tested it end to end, and owned segmentation, subject lines, pre-header text, email design, and sequencing logic.",
-    // No `canvas` here, unlike CS1: this study shows the real ActiveCampaign
-    // capture instead of the drawn approximation of it. The screenshot carries
-    // strictly more than the diagram did — the actual condition wording, the
-    // nested purchase check on the Yes path, and live per-email metrics — and
-    // the drawn version had to keep its 11 email nodes generic anyway, since
-    // the source only exposes real subject lines for emails 1 and 2.
+    // No `canvas` here: this study shows the real ActiveCampaign capture, which
+    // carries more than a drawn approximation could.
     visualHeading: "The flow",
-    // The grid card keeps its 50.78% tile rather than promoting this figure to
-    // a thumbnail; see cardVisual on the CaseStudy type.
     cardVisual: "metric",
     figures: [
       {
@@ -414,6 +347,7 @@ export const caseStudies: CaseStudy[] = [
   },
 ];
 
+// Feeds components/FunnelStrip.tsx, which nothing currently renders.
 export const funnelStripSteps: AutomationNode[] = [
   { id: "reengagement", kind: "trigger", label: "STEP 1", title: "Re-engagement" },
   { id: "completed", kind: "goal", label: "STEP 2", title: "SO Tool completed" },

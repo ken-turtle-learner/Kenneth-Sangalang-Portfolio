@@ -2,15 +2,8 @@ import Reveal from "@/components/Reveal";
 import Tag from "@/components/Tag";
 import { skillGroups } from "@/content/skills";
 
-// Renders the five skill groups as pill tags — no proficiency bars/ratings,
-// since there's no real data behind a rating and it would read as filler
-// (see the "no invented content" rule this whole site follows).
-//
-// A plain block rather than its own <Section>: it now sits inside About,
-// which is where the reference layout puts a technical-skills list and where
-// it reads as part of Kenneth's background rather than as a standalone
-// keyword dump. The named platforms also appear in the TechStrip near the top
-// of the page; that one is a summary for scanning, this is the full grouping.
+// The skill groups from content/skills.ts, as pill tags. A plain block rather
+// than its own <Section> because it renders inside About.
 export default function SkillsMatrix() {
   return (
     <div className="mt-16 border-t border-border pt-10">

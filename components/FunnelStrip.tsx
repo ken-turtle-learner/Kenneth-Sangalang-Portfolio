@@ -11,8 +11,6 @@ type FunnelStripProps = {
   label: string;
 };
 
-// Horizontal arrowhead — hoisted per rendering-hoist-jsx, same reasoning as
-// AutomationCanvas's vertical one.
 const CONNECTOR_ARROWHEAD = <polygon points="40.0,8.0 40.0,16.0 44.0,12.0" className="canvas-connector-arrow" />;
 
 function Connector({ index }: { index: number }) {
@@ -26,14 +24,9 @@ function Connector({ index }: { index: number }) {
   );
 }
 
-// The horizontal variant of the automation canvas: one row of nodes telling a
-// left-to-right story. Used on the home page for the connected funnel
-// (re-engagement -> SO Tool completed -> 11-email nurture -> Leadership
-// Essentials) that spans all four case studies. Wrapped in overflow-x-auto so
-// a narrow viewport scrolls the strip itself instead of widening the page.
-//
-// Takes its steps as a prop rather than importing them, so the component is
-// about the *shape* (a horizontal rail) rather than about one specific funnel.
+// Horizontal variant of the automation canvas: one row of nodes telling a
+// left-to-right story. Currently unused on the site — kept as the counterpart
+// to AutomationCanvas for any funnel that reads better as a rail.
 export default function FunnelStrip({ steps, label }: FunnelStripProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);

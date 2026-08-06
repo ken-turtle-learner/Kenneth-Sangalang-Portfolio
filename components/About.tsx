@@ -11,37 +11,27 @@ const FACTS = [
   { label: "Currently", lines: [profile.currently] },
 ];
 
-// Portrait left, narrative right, then the fact sheet and the skills
-// breakdown. The heading is Kenneth's own closing line from the story rather
-// than a label like "About me" — it's the throughline of every paragraph
-// underneath it.
-//
-// The story replaced an earlier mechanical-engineering "pivot" framing. The
-// degree is still real and still listed in the fact sheet below; it just
-// isn't the narrative any more, because the narrative Kenneth tells starts at
-// WordPress.
+// Portrait, narrative, fact sheet, skills breakdown. Copy comes from
+// content/profile.ts; the heading and intro are set below.
 export default function About() {
   return (
     <Section
       id="about"
-      label="About"
-      heading="Find the gap, learn what it takes, close it"
-      intro="How managing WordPress sites turned into writing the code behind them."
+      label=""
+      heading="About Me"
+      intro=""
     >
       <div className="mt-12 grid gap-10 md:grid-cols-[1fr_2fr] md:gap-16">
         <Reveal index={0}>
-          {/* No preload here (and no `priority`, which Next 16 deprecated in
-              favour of `preload`): this is the second, below-the-fold copy of
-              a photo the hero already preloads, so preloading it again would
-              only queue a duplicate fetch at the wrong priority. Lazy loading
-              is correct; explicit width/height still prevent layout shift. */}
+          {/* No `preload` here: this is the second, below-the-fold copy of a
+              photo the hero already preloads. */}
           <Image
-            src="/kenneth-sangalang.jpg"
+            src="/kenneth-sangalang-3.png"
             alt="Portrait of Kenneth Sangalang"
             width={480}
             height={480}
             quality={75}
-            className="aspect-square w-full max-w-xs rounded-2xl border border-border object-cover md:max-w-none"
+            className="aspect-auto w-full max-w-xs rounded-4xl border border-border object-cover md:max-w-none"
           />
         </Reveal>
 
