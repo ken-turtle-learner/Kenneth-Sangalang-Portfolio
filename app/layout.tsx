@@ -87,8 +87,8 @@ export default function RootLayout({
         </a>
         <main id="main-content" className="flex flex-1 flex-col">
           {children}
-        <Analytics />
         </main>
+        <Analytics />
       </body>
     </html>
   );
