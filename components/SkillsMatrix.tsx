@@ -8,7 +8,7 @@ export default function SkillsMatrix() {
   return (
     <div className="mt-16 border-t border-border pt-10">
       {/* h3 under About's h2, with each group name an h4 below it. */}
-      <h3 className="type-h3">What I actually work with</h3>
+      <h3 className="type-h3">The tools I work with</h3>
       <div className="mt-8 grid gap-8 md:grid-cols-2">
         {skillGroups.map((group, index) => (
           <Reveal key={group.name} index={index}>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono, Montserrat, Newsreader } from "next/font/google";
 import { NO_FLASH_THEME_SCRIPT } from "@/lib/theme";
 import "./globals.css";
+import { Analytics } from '@vercel/analytics/next';
 
 // Fonts are declared at module scope so next/font initializes them once at
 // build time rather than on every render.
@@ -86,6 +87,7 @@ export default function RootLayout({
         </a>
         <main id="main-content" className="flex flex-1 flex-col">
           {children}
+        <Analytics />
         </main>
       </body>
     </html>
