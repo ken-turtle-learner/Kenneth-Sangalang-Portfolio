@@ -91,12 +91,12 @@ export default function Hero() {
           image on desktop; the second copy in About deliberately lazy-loads. */}
       <Reveal index={0} className="order-1 flex justify-center md:order-2 md:justify-end">
         <Image
-          src="/kenneth-sangalang-3.png"
+          src="/kenneth-sangalang-5.png"
           alt="Portrait of Kenneth Sangalang"
           width={380}
           height={380}
           preload
-          quality={75}
+          quality={90}
           className="h-45 w-45 rounded-full border border-accent/30 object-cover md:h-95 md:w-95 md:rounded-16xl"
         />
       </Reveal>
